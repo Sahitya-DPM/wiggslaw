@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --font-montserrat: 'Montserrat', Helvetica, Arial, Lucida, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  * {
+    font-family: var(--font-montserrat);
+  }
+  
+  body {
+    font-family: var(--font-montserrat);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-montserrat);
+  }
+  
+  p, span, div, button, input, textarea, label {
+    font-family: var(--font-montserrat);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-wiggs-gold text-wiggs-blue px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:bg-wiggs-gold-dark hover:transform hover:-translate-y-1;
+  }
+  
+  .btn-secondary {
+    @apply bg-wiggs-blue text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-wiggs-blue-light;
+  }
+  
+  .form-input {
+    @apply w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-wiggs-blue transition-colors duration-300;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-wiggs-gray-dark mb-2;
+  }
+  
+  .section-title {
+    @apply text-4xl font-bold text-wiggs-blue text-center mb-12;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-card p-8 transition-transform duration-300 hover:transform hover:-translate-y-2;
+  }
+}
