@@ -238,7 +238,7 @@ export default function AboutPage() {
 
                 <div className="pt-2 sm:pt-4">
                   <a 
-                    href="#more-about" 
+                    href="/geoff-wiggs" 
                     className="hover:text-gray-700 underline text-sm sm:text-base md:text-[17px]"
                     style={{
                       fontFamily: "'Montserrat', Helvetica, Arial, Lucida, sans-serif",
@@ -293,7 +293,7 @@ export default function AboutPage() {
 
                 <div className="pt-2 sm:pt-4">
                   <a 
-                    href="#more-about-nadya" 
+                    href="/nadya-machrus" 
                     className="hover:text-gray-700 underline text-sm sm:text-base md:text-[17px]"
                     style={{
                       fontFamily: "'Montserrat', Helvetica, Arial, Lucida, sans-serif",

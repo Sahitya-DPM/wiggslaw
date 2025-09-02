@@ -61,21 +61,23 @@ export default function GeoffWiggsPage() {
             </nav>
 
             {/* Mobile Menu Button */}
-            {isMounted && (
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-wiggs-blue"
+              className="md:hidden p-2 rounded-md text-gray-600 hover:text-wiggs-blue hover:bg-gray-100 transition-colors duration-300"
+              aria-label="Toggle mobile menu"
               >
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
                 </svg>
               </button>
-            )}
-          </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isMounted && isMobileMenuOpen && (
+          {/* Mobile Navigation Menu */}
+          {isMounted && isMobileMenuOpen && (
           <>
             {/* Backdrop */}
             <div 
@@ -126,216 +128,183 @@ export default function GeoffWiggsPage() {
             </div>
           </>
         )}
+        </div>
       </header>
 
       {/* Main Content */}
       <main className="min-h-screen">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-blue-50 to-blue-100 py-16 sm:py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <section className="py-16 sm:py-24 bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
               <div>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                  Geoff Wiggs
+                <h1 className="text-4xl sm:text-5xl font-bold mb-4" style={{ fontFamily: "'Montserrat', Helvetica, Arial, Lucida, sans-serif", color: '#02adf0' }}>
+                  Geoff Wiggs,
                 </h1>
-                <p className="text-xl sm:text-2xl text-gray-700 mb-8 leading-relaxed">
-                  Founding Attorney and Principal of The Law Offices of Geoff Wiggs
+                <p className="text-xl sm:text-2xl font-semibold mb-8" style={{ fontFamily: "'Montserrat', Helvetica, Arial, Lucida, sans-serif", color: '#02adf0' }}>
+                  Esq. Principal
                 </p>
-                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                  With over two decades of experience in bankruptcy law and estate planning, Geoff Wiggs has dedicated his career to helping individuals and families navigate complex legal challenges with compassion and expertise.
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <a href="/about#geoff" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-wiggs-blue hover:bg-blue-700 transition-colors duration-300">
-                    Learn More About Geoff
-                  </a>
-                  <a href="#contact-form" className="inline-flex items-center px-6 py-3 border border-wiggs-blue text-base font-medium rounded-md text-wiggs-blue bg-white hover:bg-blue-50 transition-colors duration-300">
-                    Schedule Consultation
-                  </a>
+                <div className="space-y-4" style={{ fontFamily: "'Montserrat', Helvetica, Arial, Lucida, sans-serif", lineHeight: '1.4', fontSize: '17px', color: 'rgb(0, 0, 0)', fontWeight: '500' }}>
+                  <p>
+                    Geoff Wiggs is a 3rd career attorney. In addition to his Juris Doctor (JD), his background includes service in the United States Air Force, a bachelor's degree in Computer Science and a Master's in Business Administration (MBA).
+                  </p>
+                  <p>
+                    <strong>United States Air Force – Airborne Vietnamese Cryptologic Linguist</strong><br />
+                    Geoff served eight years of active duty in the United States Air Force as a Vietnamese Cryptologic Linguist. After undergoing training he spent several years in Okinawa, Japan as well as duty stations in Omaha, Nebraska and Fort Meade, Maryland. In 1992, Geoff served in Operation Desert Storm in Riyadh, Saudi Arabia flying aboard the AWACS Command and Control aircraft.
+                  </p>
+                  <p>
+                    <strong>Computer Consultancy – Orcas Technologies, Inc.</strong>
+                  </p>
                 </div>
               </div>
               <div className="flex justify-center lg:justify-end">
                 <div className="relative">
                   <Image
                     src="/images/Geoffrey.webp"
-                    alt="Geoff Wiggs - Founding Attorney"
-                    width={500}
+                    alt="Geoff Wiggs - Principal Attorney"
+                    width={400}
                     height={600}
-                    className="rounded-lg shadow-2xl"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* About Geoff Section */}
-        <section className="py-16 sm:py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div>
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">
-                  A Legacy of Legal Excellence
-                </h2>
-                <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
-                  <p>
-                    Geoff Wiggs founded The Law Offices of Geoff Wiggs with a clear mission: to provide accessible, high-quality legal services to individuals and families facing financial and estate planning challenges.
-                  </p>
-                  <p>
-                    His practice focuses on consumer bankruptcy, helping individuals regain financial stability through Chapter 7 and Chapter 13 bankruptcy proceedings. Geoff understands that financial difficulties can affect every aspect of life, and he approaches each case with empathy and determination.
-                  </p>
-                  <p>
-                    In addition to bankruptcy law, Geoff is an experienced estate planning attorney who helps families protect their assets and ensure their wishes are carried out through comprehensive estate planning strategies.
-                  </p>
-                </div>
-              </div>
-              <div className="flex justify-center lg:justify-start">
-                <div className="relative">
-                  <Image
-                    src="/images/AdobeStock_251049533-2-scaled.webp"
-                    alt="Legal Excellence"
-                    width={500}
-                    height={400}
                     className="rounded-lg shadow-xl"
                   />
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Experience & Expertise Section */}
-        <section className="py-16 sm:py-24 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
-                Experience & Expertise
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Geoff's extensive experience spans multiple areas of law, providing comprehensive solutions for his clients' diverse legal needs.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div className="bg-white p-8 rounded-lg shadow-lg">
-                <div className="w-16 h-16 bg-wiggs-blue rounded-full flex items-center justify-center mb-6 mx-auto">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">Consumer Bankruptcy</h3>
-                <p className="text-gray-600 text-center">
-                  Specialized expertise in Chapter 7 and Chapter 13 bankruptcy proceedings, helping clients achieve financial fresh starts.
+            
+            {/* Full Width Content Section */}
+            <div className="mt-12">
+              <div className="space-y-4" style={{ fontFamily: "'Montserrat', Helvetica, Arial, Lucida, sans-serif", lineHeight: '1.4', fontSize: '17px', color: 'rgb(0, 0, 0)', fontWeight: '500' }}>
+                <p>
+                  For nearly 20 years, Geoff ran his own computer consultancy, Orcas Technologies, Inc. Orcas Technologies focused on customization and implementation of Enterprise Resource Planning (ERP) software for wholesale food distribution operations.
+                </p>
+                <p>
+                  Because of the nature of ERP software, Geoff worked in and learned about all of the operational areas of a distribution operation. He worked with small and mid-sized wholesale food distributors to optimize departmental processes and help them get the most out of their information technology investment. His clients included distributors across the nation.
+                </p>
+                <p>
+                  He has a degree in Computer Science from the University of Nebraska at Omaha and a Master's degree in Business Administration from Pepperdine University with a focus in Strategic Implementation.
+                </p>
+                <p>
+                  <strong>Master in Business Administration</strong><br />
+                  While running his own business, he found time to pursue his Master's in Business Administration from Pepperdine University. He focused in Strategic Implementation. After receiving his MBA, he worked for two years as a management consultant through his computer consultancy.
+                </p>
+                <p>
+                  He operated as an independent management consultant for two years prior to deciding to go to law school.
+                </p>
+                <p>
+                  <strong>Law Practice</strong><br />
+                  While in law school, Geoff concentrated on Consumer, Bankruptcy and Start-Up Law.
+                </p>
+                <p>
+                  Geoff was an Associate of the Santa Clara High Tech Law Journal and served as the Online Managing Editor.
+                </p>
+                <p>
+                  While in law school he volunteered as a clerk in the Chambers of the Honorable Arthur Weissbrodt, United States Bankruptcy Judge, in the San Jose division of the Northern California Bankruptcy Court. He graduated from Santa Clara University with a Juris Doctor in May, 2009.
+                </p>
+                <p>
+                  For family reasons he was unable to sit for the bar exam until February of 2011.
+                </p>
+                <p>
+                  Immediately after passing the bar, he opened his solo practice. Today, he focuses his practice on bankruptcy and consumer law as well as general civil law.
                 </p>
               </div>
-
-              <div className="bg-white p-8 rounded-lg shadow-lg">
-                <div className="w-16 h-16 bg-wiggs-blue rounded-full flex items-center justify-center mb-6 mx-auto">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">Estate Planning</h3>
-                <p className="text-gray-600 text-center">
-                  Comprehensive estate planning including wills, trusts, and advance directives to protect family assets and wishes.
-                </p>
-              </div>
-
-              <div className="bg-white p-8 rounded-lg shadow-lg">
-                <div className="w-16 h-16 bg-wiggs-blue rounded-full flex items-center justify-center mb-6 mx-auto">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">Business Formation</h3>
-                <p className="text-gray-600 text-center">
-                  Expert guidance in forming and structuring business entities to protect personal assets and optimize business operations.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Contact Form Section */}
-        <section id="contact-form" className="py-16 sm:py-24 bg-wiggs-blue">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-                Ready to Get Started?
-              </h2>
-              <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-                The Law Offices of Geoff Wiggs is ready to help. Contact us today to start your FREE consultation.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-xl p-8">
-              <iframe
-                src="https://form.jotform.com/240106235636145"
-                width="100%"
-                height="600"
-                style={{ border: 'none' }}
-                title="Contact Form"
-              />
             </div>
           </div>
         </section>
       </main>
 
+        {/* Contact Form Section */}
+      <section id="contact-form" className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="rounded-lg p-6">
+              <iframe
+              src="https://link.digitalpresencematters.com/widget/form/ZsaLaKI6nCZj8uLRYFxU"
+              style={{width:'100%',height:'625px',border:'none',borderRadius:'5px'}}
+              id="inline-ZsaLaKI6nCZj8uLRYFxU" 
+              data-layout="{'id':'INLINE'}"
+              data-trigger-type="alwaysShow"
+              data-trigger-value=""
+              data-activation-type="alwaysActivated"
+              data-activation-value=""
+              data-deactivation-type="neverDeactivate"
+              data-deactivation-value=""
+              data-form-name="Wiggslaw new website all pages common form"
+              data-height="625"
+              data-layout-iframe-id="inline-ZsaLaKI6nCZj8uLRYFxU"
+              data-form-id="ZsaLaKI6nCZj8uLRYFxU"
+              title="Wiggslaw new website all pages common form"
+            >
+            </iframe>
+            <script src="https://link.digitalpresencematters.com/js/form_embed.js"></script>
+          </div>
+          </div>
+        </section>
+
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <footer className="bg-white text-gray-800 py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Column 1 - Logo and Description */}
             <div>
+              <div className="mb-4">
+                <a href="/">
               <Image
                 src="/images/wiggslaw logo.webp"
                 alt="Wiggs Law Logo"
                 width={200}
                 height={80}
-                className="h-16 w-auto object-contain mb-4"
-              />
-              <p className="text-gray-300 text-sm">
-                Providing expert legal counsel with compassion and dedication.
+                    className="h-16 w-auto object-contain"
+                  />
+                </a>
+              </div>
+              <p className="text-gray-600 leading-relaxed text-sm">
+                The Law Offices of Geoff Wiggs handles cases in the areas of Estate Planning, Trust and Estate Administration, Probate and Bankruptcy. Located in San Mateo, the Law Offices of Geoff Wiggs represents clients throughout the Bay Area, and across California, Montana and Wyoming.
               </p>
             </div>
 
+            {/* Column 2 - Recent News */}
             <div>
-              <h3 className="text-lg font-semibold mb-4">Services</h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="/consumer-bankruptcy" className="hover:text-white transition-colors">Consumer Bankruptcy</a></li>
-                <li><a href="/estate-planning" className="hover:text-white transition-colors">Estate Planning</a></li>
-                <li><a href="/probate-administration" className="hover:text-white transition-colors">Probate Administration</a></li>
-                <li><a href="/business-entity-formation" className="hover:text-white transition-colors">Business Formation</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Contact</h3>
-              <div className="space-y-2 text-sm text-gray-300">
-                <p>1900 S. Norfolk Street, Suite 350</p>
-                <p>San Mateo, California 94403</p>
-                <p>Phone: (650) 577-5952</p>
-                <p>Fax: (650) 577-5953</p>
-                <p>Email: information@wiggslaw.com</p>
+              <h3 className="text-xl font-semibold mb-4" style={{ color: '#02adf0' }}>Recent News</h3>
+              <div className="text-gray-600 space-y-2">
+                <p className="text-sm">Stay updated with the latest legal insights and firm news.</p>
+                <p className="text-sm">Coming soon...</p>
               </div>
             </div>
 
+            {/* Column 3 - Quick Links */}
             <div>
-              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="/about" className="hover:text-white transition-colors">About Us</a></li>
-                <li><a href="/contact-us" className="hover:text-white transition-colors">Contact</a></li>
-                <li><a href="#blog" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              <h3 className="text-xl font-semibold mb-4" style={{ color: '#02adf0' }}>Quick Links</h3>
+              <ul className="space-y-2">
+                <li><a href="/" className="hover:text-blue-600 transition-colors duration-300 text-sm" style={{ color: '#02adf0' }}>Home</a></li>
+                <li><a href="/about" className="hover:text-blue-600 transition-colors duration-300 text-sm" style={{ color: '#02adf0' }}>About</a></li>
+                <li><a href="/consumer-bankruptcy" className="hover:text-blue-600 transition-colors duration-300 text-sm" style={{ color: '#02adf0' }}>Consumer Bankruptcy</a></li>
+                <li><a href="/estate-planning" className="hover:text-blue-600 transition-colors duration-300 text-sm" style={{ color: '#02adf0' }}>Estate Planning</a></li>
+                <li><a href="#blog" className="hover:text-blue-600 transition-colors duration-300 text-sm" style={{ color: '#02adf0' }}>Blog</a></li>
+                <li><a href="/contact-us" className="hover:text-blue-600 transition-colors duration-300 text-sm" style={{ color: '#02adf0' }}>Contact Us</a></li>
               </ul>
-            </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center">
-            <p className="text-gray-400 text-sm">
-              © {new Date().getFullYear()} The Law Offices of Geoff Wiggs. All rights reserved.
-            </p>
+            {/* Column 4 - Contact Information */}
+            <div>
+              <h3 className="text-xl font-semibold mb-4" style={{ color: '#02adf0' }}>Contact Us</h3>
+              <div className="text-gray-600 space-y-3">
+                <div>
+                  <p className="font-semibold">Law Offices of Geoff Wiggs</p>
+                  <p className="text-sm">1900 S. Norfolk Street, Suite 350</p>
+                  <p className="text-sm">San Mateo, California 94403</p>
+                </div>
+                <div>
+                  <p className="font-semibold">Phone:</p>
+                  <p className="text-sm">(650) 577-5952</p>
+                  <p className="text-sm">(650) 577-5953</p>
+                </div>
+                <div>
+                  <p className="font-semibold">Email:</p>
+                  <p className="text-sm">information@wiggslaw.com</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
     </div>
-  );
+  )
 }
