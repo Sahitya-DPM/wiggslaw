@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { blogService, BlogPost } from '@/lib/blogService';
+import { hybridBlogService } from '@/lib/hybridBlogService';
+import { BlogPost } from '@/lib/blogService';
 
 // BlogPost interface is now imported from blogService
 
@@ -30,11 +31,11 @@ export default function EditPost() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
 
-  // Load post data from blog service
+  // Load post data from hybrid blog service
   useEffect(() => {
-    const loadPost = () => {
+    const loadPost = async () => {
       try {
-        const post = blogService.getPostById(postId);
+        const post = await hybridBlogService.getPostById(postId);
         if (post) {
           setFormData({
             title: post.title,
@@ -120,8 +121,8 @@ export default function EditPost() {
     setIsSubmitting(true);
 
     try {
-      // Update the post using the blog service
-      const updatedPost = blogService.updatePost(postId, {
+      // Update the post using the hybrid blog service
+      const updatedPost = await hybridBlogService.updatePost(postId, {
         title: formData.title,
         excerpt: formData.excerpt,
         content: formData.content,

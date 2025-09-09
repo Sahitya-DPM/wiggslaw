@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { blogService, BlogPost } from '@/lib/blogService';
+import { hybridBlogService } from '@/lib/hybridBlogService';
+import { BlogPost } from '@/lib/blogService';
 
 export default function NewPost() {
   const router = useRouter();
@@ -79,8 +80,8 @@ export default function NewPost() {
     setIsSubmitting(true);
 
     try {
-      // Save the post using the blog service
-      const newPost = blogService.savePost({
+      // Save the post using the hybrid blog service
+      const newPost = await hybridBlogService.savePost({
         title: formData.title,
         excerpt: formData.excerpt,
         content: formData.content,

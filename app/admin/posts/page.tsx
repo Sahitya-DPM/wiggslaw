@@ -3,7 +3,8 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { blogService, BlogPost } from '@/lib/blogService';
+import { hybridBlogService } from '@/lib/hybridBlogService';
+import { BlogPost } from '@/lib/blogService';
 
 // BlogPost interface is now imported from blogService
 
@@ -15,9 +16,9 @@ export default function AdminPosts() {
 
   // Load posts from blog service
   useEffect(() => {
-    const loadPosts = () => {
+    const loadPosts = async () => {
       try {
-        const allPosts = blogService.getAllPosts();
+        const allPosts = await hybridBlogService.getAllPosts();
         setPosts(allPosts);
       } catch (error) {
         console.error('Error loading posts:', error);
@@ -38,9 +39,9 @@ export default function AdminPosts() {
     return matchesFilter && matchesSearch;
   });
 
-  const handleDelete = (postId: string) => {
+  const handleDelete = async (postId: string) => {
     if (confirm('Are you sure you want to delete this post?')) {
-      const success = blogService.deletePost(postId);
+      const success = await hybridBlogService.deletePost(postId);
       if (success) {
         setPosts(posts.filter(post => post.id !== postId));
       } else {

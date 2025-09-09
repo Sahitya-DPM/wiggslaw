@@ -3,7 +3,8 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { blogService, BlogPost } from '@/lib/blogService';
+import { hybridBlogService } from '@/lib/hybridBlogService';
+import { BlogPost } from '@/lib/blogService';
 
 // BlogPost interface is now imported from blogService
 
@@ -13,9 +14,9 @@ export default function AdminDashboard() {
 
   // Load posts from blog service
   useEffect(() => {
-    const loadPosts = () => {
+    const loadPosts = async () => {
       try {
-        const allPosts = blogService.getAllPosts();
+        const allPosts = await hybridBlogService.getAllPosts();
         setPosts(allPosts);
       } catch (error) {
         console.error('Error loading posts:', error);

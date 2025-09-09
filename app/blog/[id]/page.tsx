@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { blogService, BlogPost } from '@/lib/blogService';
+import { hybridBlogService } from '@/lib/hybridBlogService';
+import { BlogPost } from '@/lib/blogService';
 
 export default function BlogPostPage() {
   const params = useParams();
@@ -16,13 +17,13 @@ export default function BlogPostPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadPost = () => {
+    const loadPost = async () => {
       try {
-        const foundPost = blogService.getPostById(postId);
+        const foundPost = await hybridBlogService.getPostById(postId);
         if (foundPost && foundPost.status === 'published') {
           setPost(foundPost);
           // Increment view count
-          blogService.incrementViews(postId);
+          hybridBlogService.incrementViews(postId);
         } else {
           // Post not found or not published, redirect to blog
           router.push('/blog');

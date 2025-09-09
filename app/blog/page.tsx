@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { blogService, BlogPost } from '@/lib/blogService';
+import { hybridBlogService } from '@/lib/hybridBlogService';
+import { BlogPost } from '@/lib/blogService';
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -13,9 +14,9 @@ export default function BlogPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const loadPosts = () => {
+    const loadPosts = async () => {
       try {
-        const allPosts = blogService.getAllPosts();
+        const allPosts = await hybridBlogService.getAllPosts();
         // Only show published posts
         const publishedPosts = allPosts.filter(post => post.status === 'published');
         setPosts(publishedPosts);
