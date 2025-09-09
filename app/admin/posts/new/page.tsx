@@ -11,6 +11,7 @@ import RichTextEditor from '@/components/RichTextEditor';
 export default function NewPost() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -98,6 +99,27 @@ export default function NewPost() {
     }));
   };
 
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      slug: '',
+      excerpt: '',
+      content: '',
+      category: '',
+      status: 'draft' as 'draft' | 'published',
+      author: 'Geoff Wiggs',
+      imageUrl: '',
+      imageAlt: '',
+      featuredImage: '',
+      publishDate: new Date().toISOString().split('T')[0],
+      metaTitle: '',
+      metaDescription: ''
+    });
+    setUploadedImage(null);
+    setImagePreview('');
+    setShowSuccessMessage(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -123,8 +145,13 @@ export default function NewPost() {
 
       console.log('Post created successfully:', newPost);
       
-      // Redirect to posts list
-      router.push('/admin/posts');
+      // Show success message
+      setShowSuccessMessage(true);
+      
+      // Auto-redirect after 3 seconds
+      setTimeout(() => {
+        router.push('/admin/posts');
+      }, 3000);
     } catch (error) {
       console.error('Error creating post:', error);
       // You could add error handling here
@@ -169,6 +196,55 @@ export default function NewPost() {
           Back to Posts
         </Link>
       </motion.div>
+
+      {/* Success Message */}
+      {showSuccessMessage && (
+        <motion.div
+          className="bg-green-50 border border-green-200 rounded-md p-4 mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-green-800">
+                {formData.status === 'published' ? 'Blog published successfully!' : 'Blog saved as draft!'}
+              </h3>
+              <div className="mt-2 text-sm text-green-700">
+                <p>
+                  {formData.status === 'published' 
+                    ? 'Your blog post has been published and is now live on your website. You will be redirected to the posts list in a few seconds.'
+                    : 'Your blog post has been saved as a draft. You can edit and publish it later. You will be redirected to the posts list in a few seconds.'
+                  }
+                </p>
+              </div>
+              <div className="mt-4">
+                <div className="flex space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => router.push('/admin/posts')}
+                    className="bg-green-100 px-3 py-2 rounded-md text-sm font-medium text-green-800 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  >
+                    View All Posts
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="bg-white px-3 py-2 rounded-md text-sm font-medium text-green-800 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  >
+                    Create Another Post
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <motion.div
