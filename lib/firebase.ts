@@ -12,6 +12,9 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:123456789012:web:abcdef123456789'
 };
 
+// Check if we're using demo/placeholder values
+const isUsingDemoConfig = firebaseConfig.apiKey === 'AIzaSyDemoKey123456789';
+
 // Only initialize Firebase if we have valid config
 let app: any = null;
 let db: any = null;
@@ -24,9 +27,19 @@ try {
   db = getFirestore(app);
   auth = getAuth(app);
   storage = getStorage(app);
-  console.log('Firebase initialized successfully');
+  
+  if (isUsingDemoConfig) {
+    console.warn('⚠️ Using demo Firebase configuration. Data will be saved to localStorage only.');
+    console.warn('To enable real Firebase, create a .env.local file with your Firebase credentials.');
+    console.warn('See FIREBASE_SETUP.md for detailed instructions.');
+  } else {
+    console.log('✅ Firebase initialized successfully with real configuration');
+  }
 } catch (error) {
-  console.warn('Firebase initialization failed:', error);
+  console.warn('❌ Firebase initialization failed:', error);
+  if (isUsingDemoConfig) {
+    console.warn('This is expected with demo configuration. Data will be saved to localStorage.');
+  }
   // Set to null so other services can handle gracefully
   app = null;
   db = null;

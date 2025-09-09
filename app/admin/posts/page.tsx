@@ -43,6 +43,11 @@ export default function AdminPosts() {
       setTimeout(() => {
         setShowSuccessMessage(false);
       }, 5000);
+      
+      // Remove the URL parameter after showing the message
+      const url = new URL(window.location.href);
+      url.searchParams.delete('published');
+      window.history.replaceState({}, '', url.toString());
     }
   }, [searchParams]);
 

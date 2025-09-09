@@ -2,7 +2,7 @@ import { blogService, BlogPost } from './blogService';
 import { firebaseBlogService } from './firebaseBlogService';
 
 // Configuration to switch between localStorage and Firebase
-const USE_FIREBASE = process.env.NEXT_PUBLIC_USE_FIREBASE === 'true';
+const USE_FIREBASE = process.env.NEXT_PUBLIC_USE_FIREBASE === 'true' || true; // Always try Firebase
 
 // Always use Firebase for write operations (save, update, delete)
 const ALWAYS_USE_FIREBASE_FOR_WRITES = true;
