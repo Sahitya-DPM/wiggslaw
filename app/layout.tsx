@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { FirebaseAuthProvider } from '@/contexts/FirebaseAuthContext'
 
 export const metadata: Metadata = {
   title: 'Wiggs Law | Bankruptcy and Estate Administration',
@@ -53,7 +54,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         {/* End Google Tag Manager (noscript) */}
         
         <AuthProvider>
-          {children}
+          <FirebaseAuthProvider>
+            {children}
+          </FirebaseAuthProvider>
         </AuthProvider>
       </body>
     </html>
