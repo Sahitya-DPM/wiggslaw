@@ -28,7 +28,9 @@ export default function EditPost() {
     imageUrl: '',
     imageAlt: '',
     featuredImage: '',
-    publishDate: new Date().toISOString().split('T')[0]
+    publishDate: new Date().toISOString().split('T')[0],
+    metaTitle: '',
+    metaDescription: ''
   });
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
@@ -50,7 +52,9 @@ export default function EditPost() {
             imageUrl: post.imageUrl || '',
             imageAlt: post.imageAlt || '',
             featuredImage: post.featuredImage || '',
-            publishDate: post.publishDate || new Date().toISOString().split('T')[0]
+            publishDate: post.publishDate || new Date().toISOString().split('T')[0],
+            metaTitle: post.metaTitle || '',
+            metaDescription: post.metaDescription || ''
           });
         } else {
           // Post not found, redirect to posts list
@@ -146,6 +150,7 @@ export default function EditPost() {
       // Update the post using the hybrid blog service
       const updatedPost = await hybridBlogService.updatePost(postId, {
         title: formData.title,
+        slug: formData.slug,
         excerpt: formData.excerpt,
         content: formData.content,
         category: formData.category,
@@ -155,7 +160,9 @@ export default function EditPost() {
         imageUrl: formData.imageUrl,
         imageAlt: formData.imageAlt,
         featuredImage: formData.featuredImage,
-        publishDate: formData.publishDate
+        publishDate: formData.publishDate,
+        metaTitle: formData.metaTitle,
+        metaDescription: formData.metaDescription
       });
 
       if (updatedPost) {
@@ -281,6 +288,46 @@ export default function EditPost() {
                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Write a brief summary of your post (optional)"
               />
+            </div>
+
+            {/* Meta Title */}
+            <div>
+              <label htmlFor="metaTitle" className="block text-sm font-medium text-gray-700 mb-2">
+                Meta Title (SEO)
+              </label>
+              <input
+                type="text"
+                name="metaTitle"
+                id="metaTitle"
+                value={formData.metaTitle}
+                onChange={handleInputChange}
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="SEO-optimized title for search engines (50-60 characters)"
+                maxLength={60}
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                {formData.metaTitle.length}/60 characters
+              </p>
+            </div>
+
+            {/* Meta Description */}
+            <div>
+              <label htmlFor="metaDescription" className="block text-sm font-medium text-gray-700 mb-2">
+                Meta Description (SEO)
+              </label>
+              <textarea
+                name="metaDescription"
+                id="metaDescription"
+                rows={3}
+                value={formData.metaDescription}
+                onChange={handleInputChange}
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="SEO-optimized description for search engines (150-160 characters)"
+                maxLength={160}
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                {formData.metaDescription.length}/160 characters
+              </p>
             </div>
 
             {/* Category and Status */}

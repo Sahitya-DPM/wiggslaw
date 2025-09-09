@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
+import Head from 'next/head';
 import { hybridBlogService } from '@/lib/hybridBlogService';
 import { BlogPost } from '@/lib/blogService';
 
@@ -235,7 +236,26 @@ export default function BlogPostPage() {
   }
 
   return (
-    <main className="min-h-screen">
+    <>
+      <Head>
+        <title>{post?.metaTitle || post?.title || 'Blog Post'}</title>
+        <meta name="description" content={post?.metaDescription || post?.excerpt || ''} />
+        <meta name="keywords" content={`${post?.category}, legal advice, ${post?.author}`} />
+        <meta property="og:title" content={post?.metaTitle || post?.title || 'Blog Post'} />
+        <meta property="og:description" content={post?.metaDescription || post?.excerpt || ''} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://wiggslaw.com/blog/${post?.slug}`} />
+        {post?.featuredImage && (
+          <meta property="og:image" content={post.featuredImage} />
+        )}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post?.metaTitle || post?.title || 'Blog Post'} />
+        <meta name="twitter:description" content={post?.metaDescription || post?.excerpt || ''} />
+        {post?.featuredImage && (
+          <meta name="twitter:image" content={post.featuredImage} />
+        )}
+      </Head>
+      <main className="min-h-screen">
       {/* Header Section */}
       <section id="header" className="w-full bg-white shadow-header sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -479,6 +499,7 @@ export default function BlogPostPage() {
           </div>
         </div>
       </footer>
-    </main>
+      </main>
+    </>
   );
 }

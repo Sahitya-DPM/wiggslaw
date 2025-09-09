@@ -15,6 +15,8 @@ export interface BlogPost {
   imageAlt?: string;
   featuredImage?: string;
   publishDate?: string;
+  metaTitle?: string;
+  metaDescription?: string;
 }
 
 const STORAGE_KEY = 'wiggslaw_blog_posts';
@@ -36,6 +38,8 @@ const initializeSampleData = (): BlogPost[] => [
     title: 'Understanding Bankruptcy Law: A Complete Guide',
     slug: 'understanding-bankruptcy-law-complete-guide',
     excerpt: 'Learn about the different types of bankruptcy and how they can help you get back on track financially.',
+    metaTitle: 'Bankruptcy Law Guide - Complete Guide to Bankruptcy Types & Process',
+    metaDescription: 'Comprehensive guide to bankruptcy law, including Chapter 7, Chapter 13, and Chapter 11 bankruptcy. Learn about the bankruptcy process, requirements, and how to get back on track financially.',
     content: `# Understanding Bankruptcy Law: A Complete Guide
 
 Bankruptcy can be a complex and overwhelming process, but understanding the basics can help you make informed decisions about your financial future.
@@ -113,6 +117,8 @@ Bankruptcy is not a failure, but rather a legal tool designed to help individual
     title: 'Estate Planning: Protecting Your Family\'s Future',
     slug: 'estate-planning-protecting-family-future',
     excerpt: 'Essential steps to ensure your assets are protected and your wishes are carried out.',
+    metaTitle: 'Estate Planning Guide - Protect Your Family\'s Future with Proper Planning',
+    metaDescription: 'Learn essential estate planning strategies to protect your family\'s future. Get expert advice on wills, trusts, and asset protection from experienced estate planning attorneys.',
     content: `# Estate Planning: Protecting Your Family's Future
 
 Estate planning is one of the most important things you can do to protect your family and ensure your wishes are carried out after you're gone.
@@ -194,6 +200,8 @@ Estate planning is a gift you give to your family. By taking the time to plan no
     title: 'Business Entity Formation: LLC vs Corporation',
     slug: 'business-entity-formation-llc-vs-corporation',
     excerpt: 'Choosing the right business structure for your new venture.',
+    metaTitle: 'Business Entity Formation - LLC vs Corporation Guide for Entrepreneurs',
+    metaDescription: 'Compare LLC vs Corporation for your business. Learn about business entity formation, legal requirements, tax implications, and which structure is best for your startup.',
     content: `# Business Entity Formation: LLC vs Corporation
 
 Choosing the right business structure is one of the most important decisions you'll make when starting a business.
