@@ -13,7 +13,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const ADMIN_CREDENTIALS = {
   username: 'admin',
-  password: 'dental2024'
+  password: 'wiggslaw'
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
