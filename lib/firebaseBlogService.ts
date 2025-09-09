@@ -83,7 +83,7 @@ export const firebaseBlogService = {
     try {
       const postWithSlug = {
         ...post,
-        slug: post.slug || generateSlug(post.title)
+        slug: generateSlug(post.title)
       };
       
       const docRef = await addDoc(collection(db, COLLECTION_NAME), {

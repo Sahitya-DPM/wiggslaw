@@ -351,7 +351,7 @@ export const blogService = {
     const posts = this.getAllPosts();
     const newPost: BlogPost = {
       ...post,
-      slug: post.slug || generateSlug(post.title),
+      slug: generateSlug(post.title),
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
