@@ -1,6 +1,7 @@
 export interface BlogPost {
   id: string;
   title: string;
+  slug: string;
   excerpt: string;
   content: string;
   publishedAt: string;
@@ -18,11 +19,22 @@ export interface BlogPost {
 
 const STORAGE_KEY = 'wiggslaw_blog_posts';
 
+// Generate slug from title
+const generateSlug = (title: string): string => {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .trim();
+};
+
 // Initialize with sample data if no posts exist
 const initializeSampleData = (): BlogPost[] => [
   {
     id: '1',
     title: 'Understanding Bankruptcy Law: A Complete Guide',
+    slug: 'understanding-bankruptcy-law-complete-guide',
     excerpt: 'Learn about the different types of bankruptcy and how they can help you get back on track financially.',
     content: `# Understanding Bankruptcy Law: A Complete Guide
 
@@ -99,6 +111,7 @@ Bankruptcy is not a failure, but rather a legal tool designed to help individual
   {
     id: '2',
     title: 'Estate Planning: Protecting Your Family\'s Future',
+    slug: 'estate-planning-protecting-family-future',
     excerpt: 'Essential steps to ensure your assets are protected and your wishes are carried out.',
     content: `# Estate Planning: Protecting Your Family's Future
 
@@ -179,6 +192,7 @@ Estate planning is a gift you give to your family. By taking the time to plan no
   {
     id: '3',
     title: 'Business Entity Formation: LLC vs Corporation',
+    slug: 'business-entity-formation-llc-vs-corporation',
     excerpt: 'Choosing the right business structure for your new venture.',
     content: `# Business Entity Formation: LLC vs Corporation
 
@@ -308,11 +322,18 @@ export const blogService = {
     return posts.find(post => post.id === id) || null;
   },
 
+  // Get a single post by slug
+  getPostBySlug(slug: string): BlogPost | null {
+    const posts = this.getAllPosts();
+    return posts.find(post => post.slug === slug) || null;
+  },
+
   // Save a new post
-  savePost(post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt' | 'views'>): BlogPost {
+  savePost(post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt' | 'views' | 'slug'>): BlogPost {
     const posts = this.getAllPosts();
     const newPost: BlogPost = {
       ...post,
+      slug: post.slug || generateSlug(post.title),
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
