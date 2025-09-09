@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { hybridBlogService } from '@/lib/hybridBlogService';
@@ -9,7 +9,7 @@ import { BlogPost } from '@/lib/blogService';
 
 // BlogPost interface is now imported from blogService
 
-export default function AdminPosts() {
+function AdminPostsContent() {
   const searchParams = useSearchParams();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -132,7 +132,13 @@ export default function AdminPosts() {
               <div className="-mx-1.5 -my-1.5">
                 <button
                   type="button"
-                  onClick={() => setShowSuccessMessage(false)}
+                  onClick={() => {
+                    setShowSuccessMessage(false);
+                    // Remove the URL parameter when manually dismissed
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('published');
+                    window.history.replaceState({}, '', url.toString());
+                  }}
                   className="inline-flex bg-green-50 rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600"
                 >
                   <span className="sr-only">Dismiss</span>
@@ -311,5 +317,17 @@ export default function AdminPosts() {
         )}
       </motion.div>
     </div>
+  );
+}
+
+export default function AdminPosts() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <AdminPostsContent />
+    </Suspense>
   );
 }
