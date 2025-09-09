@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation';
 import { hybridBlogService } from '@/lib/hybridBlogService';
 import { BlogPost } from '@/lib/blogService';
 
-export default function BlogPage() {
+function BlogContent() {
   const searchParams = useSearchParams();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -588,5 +588,17 @@ export default function BlogPage() {
         </div>
       </footer>
     </main>
+  );
+}
+
+export default function BlogPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <BlogContent />
+    </Suspense>
   );
 }
