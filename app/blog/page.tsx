@@ -332,7 +332,7 @@ export default function BlogPage() {
             </svg>
             <h3 className="mt-2 text-sm font-medium text-gray-900">No blog posts found</h3>
             <p className="mt-1 text-sm text-gray-500">
-              {searchTerm || selectedCategory ? 'Try adjusting your search or filter.' : 'Check back later for new posts.'}
+              Check back later for new posts.
             </p>
           </div>
         ) : (
