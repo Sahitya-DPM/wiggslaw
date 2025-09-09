@@ -217,7 +217,7 @@ export default function AdminPosts() {
                   </div>
                   <div className="flex items-center space-x-2 ml-4">
                     <Link
-                      href={`/blog/${post.id}`}
+                      href={`/blog/${post.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-green-600 hover:text-green-800 text-sm font-medium px-3 py-1 rounded-md hover:bg-green-50 transition-colors duration-200 flex items-center"

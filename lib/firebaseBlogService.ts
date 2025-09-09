@@ -16,6 +16,16 @@ import { BlogPost } from './blogService';
 
 const COLLECTION_NAME = 'blogPosts';
 
+// Generate slug from title
+const generateSlug = (title: string): string => {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .trim();
+};
+
 export const firebaseBlogService = {
   // Get all posts
   async getAllPosts(): Promise<BlogPost[]> {
@@ -52,11 +62,32 @@ export const firebaseBlogService = {
     }
   },
 
-  // Save a new post
-  async savePost(post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt' | 'views'>): Promise<BlogPost> {
+  // Get a single post by slug
+  async getPostBySlug(slug: string): Promise<BlogPost | null> {
     try {
-      const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+      const q = query(collection(db, COLLECTION_NAME), where('slug', '==', slug));
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        const doc = querySnapshot.docs[0];
+        return { id: doc.id, ...doc.data() } as BlogPost;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting post by slug:', error);
+      return null;
+    }
+  },
+
+  // Save a new post
+  async savePost(post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt' | 'views' | 'slug'>): Promise<BlogPost> {
+    try {
+      const postWithSlug = {
         ...post,
+        slug: post.slug || generateSlug(post.title)
+      };
+      
+      const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+        ...postWithSlug,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         views: 0
@@ -64,7 +95,7 @@ export const firebaseBlogService = {
       
       return {
         id: docRef.id,
-        ...post,
+        ...postWithSlug,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         views: 0

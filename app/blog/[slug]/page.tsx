@@ -11,7 +11,7 @@ import { BlogPost } from '@/lib/blogService';
 export default function BlogPostPage() {
   const params = useParams();
   const router = useRouter();
-  const postId = params.id as string;
+  const slug = params.slug as string;
   
   const [post, setPost] = useState<BlogPost | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,11 +21,11 @@ export default function BlogPostPage() {
   useEffect(() => {
     const loadPost = async () => {
       try {
-        const foundPost = await hybridBlogService.getPostById(postId);
+        const foundPost = await hybridBlogService.getPostBySlug(slug);
         if (foundPost && foundPost.status === 'published') {
           setPost(foundPost);
           // Increment view count
-          hybridBlogService.incrementViews(postId);
+          hybridBlogService.incrementViews(foundPost.id);
         } else {
           // Post not found or not published, redirect to blog
           router.push('/blog');
@@ -41,7 +41,7 @@ export default function BlogPostPage() {
     };
 
     loadPost();
-  }, [postId, router]);
+  }, [slug, router]);
 
   if (isLoading) {
     return (

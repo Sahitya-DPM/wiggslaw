@@ -309,7 +309,25 @@ export const blogService = {
     }
     
     try {
-      return JSON.parse(stored);
+      const posts = JSON.parse(stored);
+      
+      // Migrate existing posts to have slugs if they don't
+      const migratedPosts = posts.map((post: any) => {
+        if (!post.slug) {
+          return {
+            ...post,
+            slug: generateSlug(post.title)
+          };
+        }
+        return post;
+      });
+      
+      // Save migrated posts if any were updated
+      if (migratedPosts.some((post: any, index: number) => !posts[index].slug)) {
+        this.savePosts(migratedPosts);
+      }
+      
+      return migratedPosts;
     } catch (error) {
       console.error('Error parsing stored posts:', error);
       return initializeSampleData();

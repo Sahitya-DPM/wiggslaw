@@ -23,6 +23,15 @@ export const hybridBlogService = {
     }
   },
 
+  // Get a single post by slug
+  async getPostBySlug(slug: string): Promise<BlogPost | null> {
+    if (USE_FIREBASE) {
+      return await firebaseBlogService.getPostBySlug(slug);
+    } else {
+      return blogService.getPostBySlug(slug);
+    }
+  },
+
   // Save a new post
   async savePost(post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt' | 'views'>): Promise<BlogPost> {
     if (USE_FIREBASE) {
