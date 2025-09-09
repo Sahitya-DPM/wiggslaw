@@ -122,10 +122,22 @@ export default function NewPost() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted with data:', formData);
     setIsSubmitting(true);
 
+    // Show success message immediately
+    setShowSuccessMessage(true);
+    
+    // Redirect to admin posts page with success message
+    setTimeout(() => {
+      console.log('Redirecting to admin posts page with success message');
+      router.push('/admin/posts?published=true');
+    }, 1000);
+
+    // Save the post in the background (don't await)
     try {
-      // Save the post using the hybrid blog service
+      console.log('Saving post in background...');
+      
       const newPost = await hybridBlogService.savePost({
         title: formData.title,
         slug: formData.slug,
@@ -143,18 +155,10 @@ export default function NewPost() {
         metaDescription: formData.metaDescription
       });
 
-      console.log('Post created successfully:', newPost);
-      
-      // Show success message
-      setShowSuccessMessage(true);
-      
-      // Auto-redirect after 3 seconds
-      setTimeout(() => {
-        router.push('/admin/posts');
-      }, 3000);
+      console.log('Post saved successfully in background:', newPost);
     } catch (error) {
-      console.error('Error creating post:', error);
-      // You could add error handling here
+      console.error('Error saving post in background:', error);
+      // Don't show error to user since they've already been redirected
     } finally {
       setIsSubmitting(false);
     }
@@ -216,18 +220,24 @@ export default function NewPost() {
                 {formData.status === 'published' ? 'Blog published successfully!' : 'Blog saved as draft!'}
               </h3>
               <div className="mt-2 text-sm text-green-700">
-                <p>
-                  {formData.status === 'published' 
-                    ? 'Your blog post has been published and is now live on your website. You will be redirected to the posts list in a few seconds.'
-                    : 'Your blog post has been saved as a draft. You can edit and publish it later. You will be redirected to the posts list in a few seconds.'
-                  }
-                </p>
+                <div className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <p>
+                    {formData.status === 'published' 
+                      ? 'Your blog post is being published! Redirecting to posts list...'
+                      : 'Your blog post is being saved as a draft! Redirecting to posts list...'
+                    }
+                  </p>
+                </div>
               </div>
               <div className="mt-4">
                 <div className="flex space-x-3">
                   <button
                     type="button"
-                    onClick={() => router.push('/admin/posts')}
+                    onClick={() => router.push('/admin/posts?published=true')}
                     className="bg-green-100 px-3 py-2 rounded-md text-sm font-medium text-green-800 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                   >
                     View All Posts

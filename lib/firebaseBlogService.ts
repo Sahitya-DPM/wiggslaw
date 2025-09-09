@@ -81,10 +81,19 @@ export const firebaseBlogService = {
   // Save a new post
   async savePost(post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt' | 'views' | 'slug'>): Promise<BlogPost> {
     try {
+      console.log('Firebase savePost called with:', post);
+      console.log('Database object:', db);
+      
+      if (!db) {
+        throw new Error('Firebase database not initialized');
+      }
+      
       const postWithSlug = {
         ...post,
         slug: generateSlug(post.title)
       };
+      
+      console.log('Post with slug:', postWithSlug);
       
       const docRef = await addDoc(collection(db, COLLECTION_NAME), {
         ...postWithSlug,
@@ -92,6 +101,8 @@ export const firebaseBlogService = {
         updatedAt: serverTimestamp(),
         views: 0
       });
+      
+      console.log('Document created with ID:', docRef.id);
       
       return {
         id: docRef.id,
