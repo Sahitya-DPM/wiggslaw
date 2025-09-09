@@ -4,6 +4,9 @@ import { firebaseBlogService } from './firebaseBlogService';
 // Configuration to switch between localStorage and Firebase
 const USE_FIREBASE = process.env.NEXT_PUBLIC_USE_FIREBASE === 'true';
 
+// Always use Firebase for write operations (save, update, delete)
+const ALWAYS_USE_FIREBASE_FOR_WRITES = true;
+
 // Helper function to try Firebase first, fallback to localStorage
 const tryFirebaseFirst = async <T>(
   firebaseOperation: () => Promise<T>,
@@ -46,32 +49,64 @@ export const hybridBlogService = {
     );
   },
 
-  // Save a new post
+  // Save a new post - always use Firebase
   async savePost(post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt' | 'views'>): Promise<BlogPost> {
+    if (ALWAYS_USE_FIREBASE_FOR_WRITES) {
+      try {
+        return await firebaseBlogService.savePost(post);
+      } catch (error) {
+        console.warn('Firebase save failed, falling back to localStorage:', error);
+        return blogService.savePost(post);
+      }
+    }
     return tryFirebaseFirst(
       () => firebaseBlogService.savePost(post),
       () => blogService.savePost(post)
     );
   },
 
-  // Update an existing post
+  // Update an existing post - always use Firebase
   async updatePost(id: string, updates: Partial<Omit<BlogPost, 'id' | 'createdAt' | 'views'>>): Promise<BlogPost | null> {
+    if (ALWAYS_USE_FIREBASE_FOR_WRITES) {
+      try {
+        return await firebaseBlogService.updatePost(id, updates);
+      } catch (error) {
+        console.warn('Firebase update failed, falling back to localStorage:', error);
+        return blogService.updatePost(id, updates);
+      }
+    }
     return tryFirebaseFirst(
       () => firebaseBlogService.updatePost(id, updates),
       () => blogService.updatePost(id, updates)
     );
   },
 
-  // Delete a post
+  // Delete a post - always use Firebase
   async deletePost(id: string): Promise<boolean> {
+    if (ALWAYS_USE_FIREBASE_FOR_WRITES) {
+      try {
+        return await firebaseBlogService.deletePost(id);
+      } catch (error) {
+        console.warn('Firebase delete failed, falling back to localStorage:', error);
+        return blogService.deletePost(id);
+      }
+    }
     return tryFirebaseFirst(
       () => firebaseBlogService.deletePost(id),
       () => blogService.deletePost(id)
     );
   },
 
-  // Increment view count
+  // Increment view count - always use Firebase
   async incrementViews(id: string): Promise<void> {
+    if (ALWAYS_USE_FIREBASE_FOR_WRITES) {
+      try {
+        return await firebaseBlogService.incrementViews(id);
+      } catch (error) {
+        console.warn('Firebase increment views failed, falling back to localStorage:', error);
+        return blogService.incrementViews(id);
+      }
+    }
     return tryFirebaseFirst(
       () => firebaseBlogService.incrementViews(id),
       () => blogService.incrementViews(id)
