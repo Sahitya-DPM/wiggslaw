@@ -27,26 +27,44 @@ const tryFirebaseFirst = async <T>(
 export const hybridBlogService = {
   // Get all posts
   async getAllPosts(): Promise<BlogPost[]> {
-    return tryFirebaseFirst(
-      () => firebaseBlogService.getAllPosts(),
-      () => blogService.getAllPosts()
-    );
+    if (USE_FIREBASE) {
+      try {
+        return await firebaseBlogService.getAllPosts();
+      } catch (error) {
+        console.warn('Firebase getAllPosts failed, falling back to localStorage:', error);
+        return blogService.getAllPosts();
+      }
+    } else {
+      return blogService.getAllPosts();
+    }
   },
 
   // Get a single post by ID
   async getPostById(id: string): Promise<BlogPost | null> {
-    return tryFirebaseFirst(
-      () => firebaseBlogService.getPostById(id),
-      () => blogService.getPostById(id)
-    );
+    if (USE_FIREBASE) {
+      try {
+        return await firebaseBlogService.getPostById(id);
+      } catch (error) {
+        console.warn('Firebase getPostById failed, falling back to localStorage:', error);
+        return blogService.getPostById(id);
+      }
+    } else {
+      return blogService.getPostById(id);
+    }
   },
 
   // Get a single post by slug
   async getPostBySlug(slug: string): Promise<BlogPost | null> {
-    return tryFirebaseFirst(
-      () => firebaseBlogService.getPostBySlug(slug),
-      () => blogService.getPostBySlug(slug)
-    );
+    if (USE_FIREBASE) {
+      try {
+        return await firebaseBlogService.getPostBySlug(slug);
+      } catch (error) {
+        console.warn('Firebase getPostBySlug failed, falling back to localStorage:', error);
+        return blogService.getPostBySlug(slug);
+      }
+    } else {
+      return blogService.getPostBySlug(slug);
+    }
   },
 
   // Save a new post - always use Firebase
@@ -107,33 +125,48 @@ export const hybridBlogService = {
         return blogService.incrementViews(id);
       }
     }
-    return tryFirebaseFirst(
-      () => firebaseBlogService.incrementViews(id),
-      () => blogService.incrementViews(id)
-    );
+    return blogService.incrementViews(id);
   },
 
   // Get posts by status
   async getPostsByStatus(status: 'published' | 'draft'): Promise<BlogPost[]> {
-    return tryFirebaseFirst(
-      () => firebaseBlogService.getPostsByStatus(status),
-      () => blogService.getPostsByStatus(status)
-    );
+    if (USE_FIREBASE) {
+      try {
+        return await firebaseBlogService.getPostsByStatus(status);
+      } catch (error) {
+        console.warn('Firebase getPostsByStatus failed, falling back to localStorage:', error);
+        return blogService.getPostsByStatus(status);
+      }
+    } else {
+      return blogService.getPostsByStatus(status);
+    }
   },
 
   // Search posts
   async searchPosts(query: string): Promise<BlogPost[]> {
-    return tryFirebaseFirst(
-      () => firebaseBlogService.searchPosts(query),
-      () => blogService.searchPosts(query)
-    );
+    if (USE_FIREBASE) {
+      try {
+        return await firebaseBlogService.searchPosts(query);
+      } catch (error) {
+        console.warn('Firebase searchPosts failed, falling back to localStorage:', error);
+        return blogService.searchPosts(query);
+      }
+    } else {
+      return blogService.searchPosts(query);
+    }
   },
 
   // Initialize sample data
   async initializeSampleData(): Promise<void> {
-    return tryFirebaseFirst(
-      () => firebaseBlogService.initializeSampleData(),
-      () => Promise.resolve() // For localStorage, sample data is already initialized
-    );
+    if (USE_FIREBASE) {
+      try {
+        return await firebaseBlogService.initializeSampleData();
+      } catch (error) {
+        console.warn('Firebase initializeSampleData failed, falling back to localStorage:', error);
+        return Promise.resolve(); // For localStorage, sample data is already initialized
+      }
+    } else {
+      return Promise.resolve(); // For localStorage, sample data is already initialized
+    }
   }
 };
