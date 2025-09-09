@@ -27,13 +27,19 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     setMounted(true);
     
-    // Listen for authentication state changes
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setIsLoading(false);
-    });
+    // Only set up auth listener if Firebase is initialized
+    if (auth) {
+      // Listen for authentication state changes
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        setUser(user);
+        setIsLoading(false);
+      });
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    } else {
+      // If Firebase is not initialized, just set loading to false
+      setIsLoading(false);
+    }
   }, []);
 
   // Prevent hydration mismatch
@@ -53,6 +59,10 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
+      if (!auth) {
+        console.warn('Firebase auth not initialized');
+        return false;
+      }
       await signInWithEmailAndPassword(auth, email, password);
       return true;
     } catch (error) {
@@ -63,6 +73,10 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
 
   const logout = async (): Promise<void> => {
     try {
+      if (!auth) {
+        console.warn('Firebase auth not initialized');
+        return;
+      }
       await signOut(auth);
     } catch (error) {
       console.error('Logout error:', error);
