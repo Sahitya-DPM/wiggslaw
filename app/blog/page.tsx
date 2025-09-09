@@ -375,7 +375,8 @@ export default function BlogPage() {
                           fontFamily: "'Montserrat', Helvetica, Arial, Lucida, sans-serif !important",
                           fontWeight: 700,
                           color: '#02adf0',
-                          fontSize: '30px'
+                          fontSize: '30px',
+                          lineHeight: '1em'
                         }}
                       >
                         {post.title}
