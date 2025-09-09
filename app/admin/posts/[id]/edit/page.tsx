@@ -6,6 +6,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { hybridBlogService } from '@/lib/hybridBlogService';
 import { BlogPost } from '@/lib/blogService';
+import RichTextEditor from '@/components/RichTextEditor';
 
 // BlogPost interface is now imported from blogService
 
@@ -18,6 +19,7 @@ export default function EditPost() {
   const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     title: '',
+    slug: '',
     excerpt: '',
     content: '',
     category: '',
@@ -39,6 +41,7 @@ export default function EditPost() {
         if (post) {
           setFormData({
             title: post.title,
+            slug: post.slug || '',
             excerpt: post.excerpt,
             content: post.content,
             category: post.category,
@@ -66,12 +69,31 @@ export default function EditPost() {
     loadPost();
   }, [postId, router]);
 
+  // Generate slug from title
+  const generateSlug = (title: string): string => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .trim();
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [name]: value
+      };
+      
+      // Auto-generate slug when title changes
+      if (name === 'title') {
+        newData.slug = generateSlug(value);
+      }
+      
+      return newData;
+    });
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -224,6 +246,25 @@ export default function EditPost() {
                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter a compelling title for your post"
               />
+            </div>
+
+            {/* Slug */}
+            <div>
+              <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
+                URL Slug
+              </label>
+              <input
+                type="text"
+                name="slug"
+                id="slug"
+                value={formData.slug}
+                onChange={handleInputChange}
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="url-friendly-slug"
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                This will be used in the URL. Auto-generated from title, but you can edit it.
+              </p>
             </div>
 
             {/* Excerpt */}
@@ -470,19 +511,14 @@ export default function EditPost() {
             <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
               Content *
             </label>
-            <textarea
-              name="content"
-              id="content"
-              rows={20}
-              required
+            <RichTextEditor
               value={formData.content}
-              onChange={handleInputChange}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-mono"
-              placeholder="Write your post content here. You can use Markdown formatting..."
+              onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
+              placeholder="Write your post content here. Use the toolbar above to format your text..."
+              height="500px"
             />
             <p className="mt-2 text-sm text-gray-500">
-              You can use Markdown formatting for rich text. 
-              <a href="#" className="text-blue-600 hover:text-blue-800 ml-1">Learn more about Markdown</a>
+              Use the toolbar above to format your text with headings, links, lists, colors, and more.
             </p>
           </div>
         </motion.div>
@@ -536,9 +572,12 @@ export default function EditPost() {
               </span>
             </div>
             <div className="prose max-w-none">
-              <div className="whitespace-pre-wrap text-gray-700">
-                {formData.content || 'Start writing your content...'}
-              </div>
+              <div 
+                className="text-gray-700"
+                dangerouslySetInnerHTML={{ 
+                  __html: formData.content || '<p class="text-gray-400 italic">Start writing your content...</p>' 
+                }}
+              />
             </div>
           </div>
         </motion.div>
