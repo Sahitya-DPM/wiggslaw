@@ -141,26 +141,45 @@ export const hybridBlogService = {
     console.log('🔄 Hybrid: Updating post:', id);
     console.log('📝 Hybrid: Update data:', updates);
     
-    // Always update localStorage first for reliability
-    const updatedPost = blogService.updatePost(id, updates);
-    console.log('💾 Hybrid: Local update result:', updatedPost ? 'Success' : 'Failed');
-    
-    // If Firebase is enabled, also try to update there
+    // If Firebase is enabled, prioritize Firebase for updates
     if (USE_FIREBASE) {
       try {
+        console.log('🔥 Hybrid: Updating in Firebase first...');
         const firebaseResult = await firebaseBlogService.updatePost(id, updates);
         console.log('🔥 Hybrid: Firebase update result:', firebaseResult ? 'Success' : 'Failed');
         
         if (firebaseResult) {
-          console.log('✅ Post updated in both localStorage and Firebase');
+          // Sync the updated post back to localStorage
+          console.log('💾 Hybrid: Syncing updated post to localStorage...');
+          const localPosts = blogService.getAllPosts();
+          const existingIndex = localPosts.findIndex(post => post.id === id);
+          
+          if (existingIndex !== -1) {
+            // Update existing post in localStorage
+            localPosts[existingIndex] = firebaseResult;
+            blogService.savePosts(localPosts);
+            console.log('✅ Post updated in Firebase and synced to localStorage');
+          } else {
+            // Add new post to localStorage
+            localPosts.push(firebaseResult);
+            blogService.savePosts(localPosts);
+            console.log('✅ Post updated in Firebase and added to localStorage');
+          }
+          
+          return firebaseResult;
         } else {
-          console.warn('⚠️ Firebase update returned null, but localStorage was updated');
+          console.warn('⚠️ Firebase update failed, trying localStorage fallback...');
         }
       } catch (error) {
         console.error('❌ Firebase update failed:', error);
-        console.warn('⚠️ Firebase update failed, but post updated in localStorage');
+        console.warn('⚠️ Firebase update failed, trying localStorage fallback...');
       }
     }
+    
+    // Fallback to localStorage if Firebase is disabled or failed
+    console.log('💾 Hybrid: Updating in localStorage...');
+    const updatedPost = blogService.updatePost(id, updates);
+    console.log('💾 Hybrid: Local update result:', updatedPost ? 'Success' : 'Failed');
     
     console.log('📊 Hybrid: Final update result:', updatedPost ? 'Success' : 'Failed');
     return updatedPost;
@@ -168,28 +187,36 @@ export const hybridBlogService = {
 
   // Delete a post
   async deletePost(id: string): Promise<boolean> {
-    console.log('🗑️ Deleting post:', id);
+    console.log('🗑️ Hybrid: Deleting post:', id);
     
-    // Always delete from localStorage first for reliability
-    const localDeleted = blogService.deletePost(id);
-    console.log('Local delete result:', localDeleted);
-    
-    // If Firebase is enabled, also try to delete there
+    // If Firebase is enabled, prioritize Firebase for deletes
     if (USE_FIREBASE) {
       try {
+        console.log('🔥 Hybrid: Deleting from Firebase first...');
         const firebaseDeleted = await firebaseBlogService.deletePost(id);
-        console.log('Firebase delete result:', firebaseDeleted);
+        console.log('🔥 Hybrid: Firebase delete result:', firebaseDeleted ? 'Success' : 'Failed');
         
         if (firebaseDeleted) {
-          console.log('✅ Post deleted from both localStorage and Firebase');
+          // Also delete from localStorage
+          console.log('💾 Hybrid: Deleting from localStorage...');
+          const localDeleted = blogService.deletePost(id);
+          console.log('💾 Hybrid: Local delete result:', localDeleted ? 'Success' : 'Failed');
+          
+          console.log('✅ Post deleted from both Firebase and localStorage');
+          return true;
         } else {
-          console.warn('⚠️ Firebase delete failed, but post deleted from localStorage');
+          console.warn('⚠️ Firebase delete failed, trying localStorage fallback...');
         }
       } catch (error) {
-        console.error('❌ Firebase delete error:', error);
-        console.warn('⚠️ Firebase delete failed, but post deleted from localStorage');
+        console.error('❌ Firebase delete failed:', error);
+        console.warn('⚠️ Firebase delete failed, trying localStorage fallback...');
       }
     }
+    
+    // Fallback to localStorage if Firebase is disabled or failed
+    console.log('💾 Hybrid: Deleting from localStorage...');
+    const localDeleted = blogService.deletePost(id);
+    console.log('💾 Hybrid: Local delete result:', localDeleted ? 'Success' : 'Failed');
     
     return localDeleted;
   },
