@@ -55,7 +55,7 @@ export default function GeoffWiggsPage() {
                     </div>
                   )}
                 </li>
-                <li><a href="#blog" className="text-black text-opacity-60 font-medium hover:text-wiggs-blue transition-colors duration-300 uppercase tracking-wide text-xl">BLOG</a></li>
+                <li><a href="/blog" className="text-black text-opacity-60 font-medium hover:text-wiggs-blue transition-colors duration-300 uppercase tracking-wide text-xl">BLOG</a></li>
                 <li><a href="/contact-us" className="text-black text-opacity-60 font-medium hover:text-wiggs-blue transition-colors duration-300 uppercase tracking-wide text-xl">CONTACT US</a></li>
               </ul>
             </nav>
@@ -108,7 +108,7 @@ export default function GeoffWiggsPage() {
                     <li><a href="/estate-planning" className="block text-lg text-gray-700 hover:text-wiggs-blue transition-colors duration-300">Estate Planning</a></li>
                     <li><a href="/probate-administration" className="block text-lg text-gray-700 hover:text-wiggs-blue transition-colors duration-300">Probate and Trust Administration</a></li>
                     <li><a href="/business-entity-formation" className="block text-lg text-gray-700 hover:text-wiggs-blue transition-colors duration-300">Business and Entity Formation</a></li>
-                    <li><a href="#blog" className="block text-lg text-gray-700 hover:text-wiggs-blue transition-colors duration-300">BLOG</a></li>
+                    <li><a href="/blog" className="block text-lg text-gray-700 hover:text-wiggs-blue transition-colors duration-300">BLOG</a></li>
                     <li><a href="/contact-us" className="block text-lg text-gray-700 hover:text-wiggs-blue transition-colors duration-300">CONTACT US</a></li>
                   </ul>
                 </nav>
