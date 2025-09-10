@@ -5,7 +5,8 @@ import { firebaseBlogService } from './firebaseBlogService';
 const USE_FIREBASE = process.env.NEXT_PUBLIC_USE_FIREBASE === 'true';
 
 // Always use Firebase for write operations (save, update, delete)
-const ALWAYS_USE_FIREBASE_FOR_WRITES = true;
+const ALWAYS_USE_FIREBASE_FOR_WRITES = USE_FIREBASE;
+
 
 // Helper function to try Firebase first, fallback to localStorage
 const tryFirebaseFirst = async <T>(
@@ -27,193 +28,130 @@ const tryFirebaseFirst = async <T>(
 export const hybridBlogService = {
   // Get all posts
   async getAllPosts(): Promise<BlogPost[]> {
+    // Always try localStorage first for reliability
+    const localPosts = blogService.getAllPosts();
+    
+    // If we have posts in localStorage, return them
+    if (localPosts.length > 0) {
+      return localPosts;
+    }
+    
+    // If no posts in localStorage and Firebase is enabled, try Firebase
     if (USE_FIREBASE) {
       try {
-        return await firebaseBlogService.getAllPosts();
-      } catch (error) {
-        console.warn('Firebase getAllPosts failed, falling back to localStorage:', error);
-        // Ensure localStorage has sample data if Firebase fails
-        const localPosts = blogService.getAllPosts();
-        if (localPosts.length === 0) {
-          console.log('No posts in localStorage, initializing with sample data...');
-          // Initialize with sample data
-          blogService.savePosts([
-            {
-              id: '1',
-              title: 'Understanding Bankruptcy Law: A Complete Guide',
-              slug: 'understanding-bankruptcy-law-complete-guide',
-              excerpt: 'Learn about the different types of bankruptcy and how they can help you get back on track financially.',
-              content: '# Understanding Bankruptcy Law: A Complete Guide\n\nBankruptcy can be a complex and overwhelming process, but understanding the basics can help you make informed decisions about your financial future.\n\n## Types of Bankruptcy\n\n### Chapter 7 Bankruptcy\nChapter 7 bankruptcy, also known as "liquidation bankruptcy," is designed for individuals with limited income who cannot pay their debts.\n\n### Chapter 13 Bankruptcy\nChapter 13 bankruptcy, also known as "reorganization bankruptcy," allows individuals with regular income to create a repayment plan.\n\n*This article is for informational purposes only and does not constitute legal advice.*',
-              publishedAt: '2024-01-15',
-              status: 'published',
-              views: 1250,
-              author: 'Geoff Wiggs',
-              category: 'Bankruptcy',
-              createdAt: '2024-01-15T10:00:00Z',
-              updatedAt: '2024-01-15T10:00:00Z',
-              imageUrl: '/images/AdobeStock_251049533-2-scaled.webp',
-              imageAlt: 'Bankruptcy law consultation',
-              featuredImage: '/images/AdobeStock_251049533-2-scaled.webp',
-              publishDate: '2024-01-15'
-            },
-            {
-              id: '2',
-              title: 'Estate Planning: Protecting Your Family\'s Future',
-              slug: 'estate-planning-protecting-family-future',
-              excerpt: 'Essential steps to ensure your assets are protected and your wishes are carried out.',
-              content: '# Estate Planning: Protecting Your Family\'s Future\n\nEstate planning is one of the most important things you can do to protect your family and ensure your wishes are carried out after you\'re gone.\n\n## What is Estate Planning?\n\nEstate planning involves making decisions about how your assets will be managed and distributed after your death.\n\n*This article is for informational purposes only and does not constitute legal advice.*',
-              publishedAt: '2024-01-10',
-              status: 'published',
-              views: 890,
-              author: 'Nadya Machrus',
-              category: 'Estate Planning',
-              createdAt: '2024-01-10T10:00:00Z',
-              updatedAt: '2024-01-10T10:00:00Z',
-              imageUrl: '/images/AdobeStock_303448308-scaled.webp',
-              imageAlt: 'Estate planning documents',
-              featuredImage: '/images/AdobeStock_303448308-scaled.webp',
-              publishDate: '2024-01-10'
-            }
-          ]);
-          return blogService.getAllPosts();
+        const posts = await firebaseBlogService.getAllPosts();
+        
+        // If we got posts from Firebase, save them to localStorage for future use
+        if (posts.length > 0) {
+          blogService.savePosts(posts);
         }
-        return localPosts;
+        
+        return posts;
+      } catch (error) {
+        console.warn('Firebase getAllPosts failed:', error);
+        // Fall through to sample data initialization
       }
-    } else {
-      return blogService.getAllPosts();
     }
+    
+    // If we reach here, either Firebase is disabled or failed, and localStorage is empty
+    // The blogService.getAllPosts() should have already initialized sample data
+    // But let's make sure by calling it again
+    const finalPosts = blogService.getAllPosts();
+    return finalPosts;
   },
 
   // Get a single post by ID
   async getPostById(id: string): Promise<BlogPost | null> {
-    if (USE_FIREBASE) {
-      try {
-        return await firebaseBlogService.getPostById(id);
-      } catch (error) {
-        console.warn('Firebase getPostById failed, falling back to localStorage:', error);
-        // Ensure localStorage has sample data if Firebase fails
-        const localPosts = blogService.getAllPosts();
-        if (localPosts.length === 0) {
-          await this.getAllPosts(); // This will initialize sample data
-        }
-        return blogService.getPostById(id);
-      }
-    } else {
-      return blogService.getPostById(id);
-    }
+    // Always use localStorage for reads
+    return blogService.getPostById(id);
   },
 
   // Get a single post by slug
   async getPostBySlug(slug: string): Promise<BlogPost | null> {
+    // Always use localStorage for reads
+    return blogService.getPostBySlug(slug);
+  },
+
+  // Save a new post
+  async savePost(post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt' | 'views'>): Promise<BlogPost> {
+    // Always save to localStorage first for reliability
+    const savedPost = blogService.savePost(post);
+    
+    // If Firebase is enabled, also try to save there
     if (USE_FIREBASE) {
       try {
-        return await firebaseBlogService.getPostBySlug(slug);
+        await firebaseBlogService.savePost(post);
+        console.log('Post also saved to Firebase');
       } catch (error) {
-        console.warn('Firebase getPostBySlug failed, falling back to localStorage:', error);
-        // Ensure localStorage has sample data if Firebase fails
-        const localPosts = blogService.getAllPosts();
-        if (localPosts.length === 0) {
-          await this.getAllPosts(); // This will initialize sample data
-        }
-        return blogService.getPostBySlug(slug);
-      }
-    } else {
-      return blogService.getPostBySlug(slug);
-    }
-  },
-
-  // Save a new post - always use Firebase
-  async savePost(post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt' | 'views'>): Promise<BlogPost> {
-    if (ALWAYS_USE_FIREBASE_FOR_WRITES) {
-      try {
-        return await firebaseBlogService.savePost(post);
-      } catch (error) {
-        console.warn('Firebase save failed, falling back to localStorage:', error);
-        return blogService.savePost(post);
+        console.warn('Firebase save failed, but post saved to localStorage:', error);
       }
     }
-    return tryFirebaseFirst(
-      () => firebaseBlogService.savePost(post),
-      () => blogService.savePost(post)
-    );
+    
+    return savedPost;
   },
 
-  // Update an existing post - always use Firebase
+  // Update an existing post
   async updatePost(id: string, updates: Partial<Omit<BlogPost, 'id' | 'createdAt' | 'views'>>): Promise<BlogPost | null> {
-    if (ALWAYS_USE_FIREBASE_FOR_WRITES) {
+    // Always update localStorage first for reliability
+    const updatedPost = blogService.updatePost(id, updates);
+    
+    // If Firebase is enabled, also try to update there
+    if (USE_FIREBASE) {
       try {
-        return await firebaseBlogService.updatePost(id, updates);
+        await firebaseBlogService.updatePost(id, updates);
+        console.log('Post also updated in Firebase');
       } catch (error) {
-        console.warn('Firebase update failed, falling back to localStorage:', error);
-        return blogService.updatePost(id, updates);
+        console.warn('Firebase update failed, but post updated in localStorage:', error);
       }
     }
-    return tryFirebaseFirst(
-      () => firebaseBlogService.updatePost(id, updates),
-      () => blogService.updatePost(id, updates)
-    );
+    
+    return updatedPost;
   },
 
-  // Delete a post - always use Firebase
+  // Delete a post
   async deletePost(id: string): Promise<boolean> {
-    if (ALWAYS_USE_FIREBASE_FOR_WRITES) {
+    // Always delete from localStorage first for reliability
+    const deleted = blogService.deletePost(id);
+    
+    // If Firebase is enabled, also try to delete there
+    if (USE_FIREBASE) {
       try {
-        return await firebaseBlogService.deletePost(id);
+        await firebaseBlogService.deletePost(id);
+        console.log('Post also deleted from Firebase');
       } catch (error) {
-        console.warn('Firebase delete failed, falling back to localStorage:', error);
-        return blogService.deletePost(id);
+        console.warn('Firebase delete failed, but post deleted from localStorage:', error);
       }
     }
-    return tryFirebaseFirst(
-      () => firebaseBlogService.deletePost(id),
-      () => blogService.deletePost(id)
-    );
+    
+    return deleted;
   },
 
-  // Increment view count - always use Firebase
+  // Increment view count
   async incrementViews(id: string): Promise<void> {
-    if (ALWAYS_USE_FIREBASE_FOR_WRITES) {
+    // Always increment in localStorage first for reliability
+    blogService.incrementViews(id);
+    
+    // If Firebase is enabled, also try to increment there
+    if (USE_FIREBASE) {
       try {
-        return await firebaseBlogService.incrementViews(id);
+        await firebaseBlogService.incrementViews(id);
+        console.log('Views also incremented in Firebase');
       } catch (error) {
-        console.warn('Firebase increment views failed, falling back to localStorage:', error);
-        return blogService.incrementViews(id);
+        console.warn('Firebase increment views failed, but views incremented in localStorage:', error);
       }
     }
-    return blogService.incrementViews(id);
   },
 
   // Get posts by status
   async getPostsByStatus(status: 'published' | 'draft'): Promise<BlogPost[]> {
-    if (USE_FIREBASE) {
-      try {
-        return await firebaseBlogService.getPostsByStatus(status);
-      } catch (error) {
-        console.warn('Firebase getPostsByStatus failed, falling back to localStorage:', error);
-        // Ensure localStorage has sample data if Firebase fails
-        const localPosts = blogService.getAllPosts();
-        if (localPosts.length === 0) {
-          await this.getAllPosts(); // This will initialize sample data
-        }
-        return blogService.getPostsByStatus(status);
-      }
-    } else {
-      return blogService.getPostsByStatus(status);
-    }
+    // Always use localStorage for reads
+    return blogService.getPostsByStatus(status);
   },
 
   // Search posts
   async searchPosts(query: string): Promise<BlogPost[]> {
-    if (USE_FIREBASE) {
-      try {
-        return await firebaseBlogService.searchPosts(query);
-      } catch (error) {
-        console.warn('Firebase searchPosts failed, falling back to localStorage:', error);
-        return blogService.searchPosts(query);
-      }
-    } else {
-      return blogService.searchPosts(query);
-    }
+    // Always use localStorage for reads
+    return blogService.searchPosts(query);
   },
 
   // Initialize sample data

@@ -307,13 +307,17 @@ The right business structure depends on your specific goals, circumstances, and 
 export const blogService = {
   // Get all posts
   getAllPosts(): BlogPost[] {
-    if (typeof window === 'undefined') return [];
+    if (typeof window === 'undefined') {
+      return [];
+    }
     
     const stored = localStorage.getItem(STORAGE_KEY);
+    
     if (!stored) {
       // Initialize with sample data
-      this.savePosts(initializeSampleData());
-      return initializeSampleData();
+      const sampleData = initializeSampleData();
+      this.savePosts(sampleData);
+      return sampleData;
     }
     
     try {
@@ -338,7 +342,9 @@ export const blogService = {
       return migratedPosts;
     } catch (error) {
       console.error('Error parsing stored posts:', error);
-      return initializeSampleData();
+      const sampleData = initializeSampleData();
+      this.savePosts(sampleData);
+      return sampleData;
     }
   },
 
@@ -411,7 +417,9 @@ export const blogService = {
 
   // Save posts to localStorage
   savePosts(posts: BlogPost[]): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {
+      return;
+    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
   },
 

@@ -462,7 +462,7 @@ function BlogContent() {
                         >
                           <span>By {post.author}</span>
                           <span>•</span>
-                          <span>{new Date(post.publishDate || post.publishedAt).toLocaleDateString()}</span>
+                          <span>{new Date(post.publishedAt).toLocaleDateString()}</span>
                         </div>
                         <div className="flex items-center space-x-1">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
