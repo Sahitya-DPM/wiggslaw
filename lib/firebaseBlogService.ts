@@ -14,7 +14,7 @@ import {
 import { db } from './firebase';
 import { BlogPost } from './blogService';
 
-const COLLECTION_NAME = 'blogPosts';
+// Using 'posts' collection directly for all operations
 
 // Generate slug from title
 const generateSlug = (title: string): string => {
@@ -27,14 +27,15 @@ const generateSlug = (title: string): string => {
 };
 
 export const firebaseBlogService = {
-  // Get all posts
+  // Get all posts - Always fetch from Firestore "posts" collection, ordered by createdAt descending
   async getAllPosts(): Promise<BlogPost[]> {
     try {
       if (!db) {
         throw new Error('Firebase database not initialized');
       }
       
-      const q = query(collection(db, COLLECTION_NAME), orderBy('createdAt', 'desc'));
+      // Query the "posts" collection, ordered by createdAt descending
+      const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
       
       return querySnapshot.docs.map(doc => ({
@@ -42,19 +43,19 @@ export const firebaseBlogService = {
         ...doc.data()
       } as BlogPost));
     } catch (error) {
-      console.error('Error getting posts:', error);
+      console.error('Error getting posts from Firestore:', error);
       throw error; // Re-throw to trigger fallback
     }
   },
 
-  // Get a single post by ID
+  // Get a single post by ID - Fetch from Firestore "posts" collection
   async getPostById(id: string): Promise<BlogPost | null> {
     try {
       if (!db) {
         throw new Error('Firebase database not initialized');
       }
       
-      const docRef = doc(db, COLLECTION_NAME, id);
+      const docRef = doc(db, 'posts', id);
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
@@ -65,19 +66,19 @@ export const firebaseBlogService = {
       }
       return null;
     } catch (error) {
-      console.error('Error getting post:', error);
+      console.error('Error getting post from Firestore:', error);
       throw error; // Re-throw to trigger fallback
     }
   },
 
-  // Get a single post by slug
+  // Get a single post by slug - Fetch from Firestore "posts" collection
   async getPostBySlug(slug: string): Promise<BlogPost | null> {
     try {
       if (!db) {
         throw new Error('Firebase database not initialized');
       }
       
-      const q = query(collection(db, COLLECTION_NAME), where('slug', '==', slug));
+      const q = query(collection(db, 'posts'), where('slug', '==', slug));
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
         const doc = querySnapshot.docs[0];
@@ -85,7 +86,7 @@ export const firebaseBlogService = {
       }
       return null;
     } catch (error) {
-      console.error('Error getting post by slug:', error);
+      console.error('Error getting post by slug from Firestore:', error);
       throw error; // Re-throw to trigger fallback
     }
   },
@@ -107,7 +108,7 @@ export const firebaseBlogService = {
       
       console.log('Post with slug:', postWithSlug);
       
-      const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+      const docRef = await addDoc(collection(db, 'posts'), {
         ...postWithSlug,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -132,7 +133,7 @@ export const firebaseBlogService = {
   // Update an existing post
   async updatePost(id: string, updates: Partial<Omit<BlogPost, 'id' | 'createdAt' | 'views'>>): Promise<BlogPost | null> {
     try {
-      const docRef = doc(db, COLLECTION_NAME, id);
+      const docRef = doc(db, 'posts', id);
       await updateDoc(docRef, {
         ...updates,
         updatedAt: serverTimestamp()
@@ -167,7 +168,7 @@ export const firebaseBlogService = {
   // Increment view count
   async incrementViews(id: string): Promise<void> {
     try {
-      const docRef = doc(db, COLLECTION_NAME, id);
+      const docRef = doc(db, 'posts', id);
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
@@ -182,7 +183,7 @@ export const firebaseBlogService = {
     }
   },
 
-  // Get posts by status
+  // Get posts by status - Fetch from Firestore "posts" collection, ordered by createdAt descending
   async getPostsByStatus(status: 'published' | 'draft'): Promise<BlogPost[]> {
     try {
       if (!db) {
@@ -190,7 +191,7 @@ export const firebaseBlogService = {
       }
       
       const q = query(
-        collection(db, COLLECTION_NAME), 
+        collection(db, 'posts'), 
         where('status', '==', status),
         orderBy('createdAt', 'desc')
       );
@@ -201,7 +202,7 @@ export const firebaseBlogService = {
         ...doc.data()
       } as BlogPost));
     } catch (error) {
-      console.error('Error getting posts by status:', error);
+      console.error('Error getting posts by status from Firestore:', error);
       throw error; // Re-throw to trigger fallback
     }
   },

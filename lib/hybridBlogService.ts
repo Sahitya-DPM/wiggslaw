@@ -7,6 +7,9 @@ const USE_FIREBASE = process.env.NEXT_PUBLIC_USE_FIREBASE === 'true';
 // Always use Firebase for write operations (save, update, delete)
 const ALWAYS_USE_FIREBASE_FOR_WRITES = USE_FIREBASE;
 
+// Always try to use Firebase for reads to fetch from shared "posts" collection
+const ALWAYS_TRY_FIREBASE_FOR_READS = true;
+
 
 // Helper function to try Firebase first, fallback to localStorage
 const tryFirebaseFirst = async <T>(
@@ -26,94 +29,79 @@ const tryFirebaseFirst = async <T>(
 };
 
 export const hybridBlogService = {
-  // Get all posts
+  // Get all posts - Always fetch from Firestore "posts" collection, ordered by createdAt descending
   async getAllPosts(): Promise<BlogPost[]> {
-    try {
-      // Always try localStorage first for reliability
-      const localPosts = blogService.getAllPosts();
-      
-      // If we have posts in localStorage, return them
-      if (localPosts.length > 0) {
+    if (ALWAYS_TRY_FIREBASE_FOR_READS) {
+      try {
+        // Always try to fetch from Firestore first
+        const posts = await firebaseBlogService.getAllPosts();
+        
+        // If we got posts from Firestore, return them
+        if (posts.length > 0) {
+          return posts;
+        }
+        
+        // If no posts in Firestore, fall back to localStorage
+        const localPosts = blogService.getAllPosts();
         return localPosts;
-      }
-      
-      // If no posts in localStorage and Firebase is enabled, try Firebase
-      if (USE_FIREBASE) {
+      } catch (error) {
+        console.error('Error fetching posts from Firestore:', error);
+        
+        // Fall back to localStorage on Firestore error
         try {
-          const posts = await firebaseBlogService.getAllPosts();
-          
-          // If we got posts from Firebase, save them to localStorage for future use
-          if (posts.length > 0) {
-            blogService.savePosts(posts);
-            return posts;
-          }
-        } catch (error) {
-          console.warn('Firebase getAllPosts failed:', error);
-          // Fall through to sample data initialization
+          const localPosts = blogService.getAllPosts();
+          return localPosts;
+        } catch (localError) {
+          console.error('Error fetching posts from localStorage:', localError);
+          return [];
         }
       }
-      
-      // If we reach here, either Firebase is disabled or failed, and localStorage is empty
-      // Force initialize sample data
-      const sampleData = [
-        {
-          id: '1',
-          title: 'Understanding Bankruptcy Law: A Complete Guide',
-          slug: 'understanding-bankruptcy-law-complete-guide',
-          excerpt: 'Learn about the different types of bankruptcy and how they can help you get back on track financially.',
-          content: '# Understanding Bankruptcy Law: A Complete Guide\n\nBankruptcy can be a complex and overwhelming process, but understanding the basics can help you make informed decisions about your financial future.\n\n## Types of Bankruptcy\n\n### Chapter 7 Bankruptcy\nChapter 7 bankruptcy, also known as "liquidation bankruptcy," is designed for individuals with limited income who cannot pay their debts.\n\n### Chapter 13 Bankruptcy\nChapter 13 bankruptcy, also known as "reorganization bankruptcy," allows individuals with regular income to create a repayment plan.\n\n*This article is for informational purposes only and does not constitute legal advice.*',
-          publishedAt: '2024-01-15',
-          status: 'published' as const,
-          views: 1250,
-          author: 'Geoff Wiggs',
-          category: 'Bankruptcy',
-          createdAt: '2024-01-15T10:00:00Z',
-          updatedAt: '2024-01-15T10:00:00Z',
-          imageUrl: '/images/AdobeStock_251049533-2-scaled.webp',
-          imageAlt: 'Bankruptcy law consultation',
-          featuredImage: '/images/AdobeStock_251049533-2-scaled.webp',
-          publishDate: '2024-01-15'
-        },
-        {
-          id: '2',
-          title: 'Estate Planning: Protecting Your Family\'s Future',
-          slug: 'estate-planning-protecting-family-future',
-          excerpt: 'Essential steps to ensure your assets are protected and your wishes are carried out.',
-          content: '# Estate Planning: Protecting Your Family\'s Future\n\nEstate planning is one of the most important things you can do to protect your family and ensure your wishes are carried out after you\'re gone.\n\n## What is Estate Planning?\n\nEstate planning involves making decisions about how your assets will be managed and distributed after your death.\n\n*This article is for informational purposes only and does not constitute legal advice.*',
-          publishedAt: '2024-01-10',
-          status: 'published' as const,
-          views: 890,
-          author: 'Nadya Machrus',
-          category: 'Estate Planning',
-          createdAt: '2024-01-10T10:00:00Z',
-          updatedAt: '2024-01-10T10:00:00Z',
-          imageUrl: '/images/AdobeStock_303448308-scaled.webp',
-          imageAlt: 'Estate planning documents',
-          featuredImage: '/images/AdobeStock_303448308-scaled.webp',
-          publishDate: '2024-01-10'
-        }
-      ];
-      
-      // Save sample data to localStorage
-      blogService.savePosts(sampleData);
-      return sampleData;
-    } catch (error) {
-      console.error('Error in getAllPosts:', error);
-      // Return empty array as fallback
-      return [];
+    } else {
+      // Use localStorage only if Firebase is disabled
+      return blogService.getAllPosts();
     }
   },
 
-  // Get a single post by ID
+  // Get a single post by ID - Always fetch from Firestore first
   async getPostById(id: string): Promise<BlogPost | null> {
-    // Always use localStorage for reads
-    return blogService.getPostById(id);
+    if (ALWAYS_TRY_FIREBASE_FOR_READS) {
+      try {
+        // Try Firestore first
+        const post = await firebaseBlogService.getPostById(id);
+        if (post) {
+          return post;
+        }
+        
+        // Fall back to localStorage
+        return blogService.getPostById(id);
+      } catch (error) {
+        console.error('Error fetching post from Firestore:', error);
+        return blogService.getPostById(id);
+      }
+    } else {
+      return blogService.getPostById(id);
+    }
   },
 
-  // Get a single post by slug
+  // Get a single post by slug - Always fetch from Firestore first
   async getPostBySlug(slug: string): Promise<BlogPost | null> {
-    // Always use localStorage for reads
-    return blogService.getPostBySlug(slug);
+    if (ALWAYS_TRY_FIREBASE_FOR_READS) {
+      try {
+        // Try Firestore first
+        const post = await firebaseBlogService.getPostBySlug(slug);
+        if (post) {
+          return post;
+        }
+        
+        // Fall back to localStorage
+        return blogService.getPostBySlug(slug);
+      } catch (error) {
+        console.error('Error fetching post from Firestore:', error);
+        return blogService.getPostBySlug(slug);
+      }
+    } else {
+      return blogService.getPostBySlug(slug);
+    }
   },
 
   // Save a new post
@@ -186,16 +174,46 @@ export const hybridBlogService = {
     }
   },
 
-  // Get posts by status
+  // Get posts by status - Always fetch from Firestore first
   async getPostsByStatus(status: 'published' | 'draft'): Promise<BlogPost[]> {
-    // Always use localStorage for reads
-    return blogService.getPostsByStatus(status);
+    if (ALWAYS_TRY_FIREBASE_FOR_READS) {
+      try {
+        // Try Firestore first
+        const posts = await firebaseBlogService.getPostsByStatus(status);
+        if (posts.length > 0) {
+          return posts;
+        }
+        
+        // Fall back to localStorage
+        return blogService.getPostsByStatus(status);
+      } catch (error) {
+        console.error('Error fetching posts from Firestore:', error);
+        return blogService.getPostsByStatus(status);
+      }
+    } else {
+      return blogService.getPostsByStatus(status);
+    }
   },
 
-  // Search posts
+  // Search posts - Always fetch from Firestore first
   async searchPosts(query: string): Promise<BlogPost[]> {
-    // Always use localStorage for reads
-    return blogService.searchPosts(query);
+    if (ALWAYS_TRY_FIREBASE_FOR_READS) {
+      try {
+        // Try Firestore first
+        const posts = await firebaseBlogService.searchPosts(query);
+        if (posts.length > 0) {
+          return posts;
+        }
+        
+        // Fall back to localStorage
+        return blogService.searchPosts(query);
+      } catch (error) {
+        console.error('Error searching posts in Firestore:', error);
+        return blogService.searchPosts(query);
+      }
+    } else {
+      return blogService.searchPosts(query);
+    }
   },
 
   // Initialize sample data
