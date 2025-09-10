@@ -27,8 +27,8 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     setMounted(true);
     
-    // Only set up auth listener if Firebase is initialized
-    if (auth) {
+    // Only set up auth listener if Firebase is initialized and not using demo config
+    if (auth && process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== 'AIzaSyDemoKey123456789') {
       // Listen for authentication state changes
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         setUser(user);
@@ -37,7 +37,7 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
 
       return () => unsubscribe();
     } else {
-      // If Firebase is not initialized, just set loading to false
+      // If Firebase is not initialized or using demo config, just set loading to false
       setIsLoading(false);
     }
   }, []);

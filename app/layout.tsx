@@ -54,9 +54,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         {/* End Google Tag Manager (noscript) */}
         
         <AuthProvider>
-          <FirebaseAuthProvider>
-            {children}
-          </FirebaseAuthProvider>
+          {process.env.NEXT_PUBLIC_FIREBASE_API_KEY === 'AIzaSyDemoKey123456789' ? (
+            children
+          ) : (
+            <FirebaseAuthProvider>
+              {children}
+            </FirebaseAuthProvider>
+          )}
         </AuthProvider>
       </body>
     </html>

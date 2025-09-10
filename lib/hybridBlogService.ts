@@ -28,36 +28,80 @@ const tryFirebaseFirst = async <T>(
 export const hybridBlogService = {
   // Get all posts
   async getAllPosts(): Promise<BlogPost[]> {
-    // Always try localStorage first for reliability
-    const localPosts = blogService.getAllPosts();
-    
-    // If we have posts in localStorage, return them
-    if (localPosts.length > 0) {
-      return localPosts;
-    }
-    
-    // If no posts in localStorage and Firebase is enabled, try Firebase
-    if (USE_FIREBASE) {
-      try {
-        const posts = await firebaseBlogService.getAllPosts();
-        
-        // If we got posts from Firebase, save them to localStorage for future use
-        if (posts.length > 0) {
-          blogService.savePosts(posts);
-        }
-        
-        return posts;
-      } catch (error) {
-        console.warn('Firebase getAllPosts failed:', error);
-        // Fall through to sample data initialization
+    try {
+      // Always try localStorage first for reliability
+      const localPosts = blogService.getAllPosts();
+      
+      // If we have posts in localStorage, return them
+      if (localPosts.length > 0) {
+        return localPosts;
       }
+      
+      // If no posts in localStorage and Firebase is enabled, try Firebase
+      if (USE_FIREBASE) {
+        try {
+          const posts = await firebaseBlogService.getAllPosts();
+          
+          // If we got posts from Firebase, save them to localStorage for future use
+          if (posts.length > 0) {
+            blogService.savePosts(posts);
+            return posts;
+          }
+        } catch (error) {
+          console.warn('Firebase getAllPosts failed:', error);
+          // Fall through to sample data initialization
+        }
+      }
+      
+      // If we reach here, either Firebase is disabled or failed, and localStorage is empty
+      // Force initialize sample data
+      const sampleData = [
+        {
+          id: '1',
+          title: 'Understanding Bankruptcy Law: A Complete Guide',
+          slug: 'understanding-bankruptcy-law-complete-guide',
+          excerpt: 'Learn about the different types of bankruptcy and how they can help you get back on track financially.',
+          content: '# Understanding Bankruptcy Law: A Complete Guide\n\nBankruptcy can be a complex and overwhelming process, but understanding the basics can help you make informed decisions about your financial future.\n\n## Types of Bankruptcy\n\n### Chapter 7 Bankruptcy\nChapter 7 bankruptcy, also known as "liquidation bankruptcy," is designed for individuals with limited income who cannot pay their debts.\n\n### Chapter 13 Bankruptcy\nChapter 13 bankruptcy, also known as "reorganization bankruptcy," allows individuals with regular income to create a repayment plan.\n\n*This article is for informational purposes only and does not constitute legal advice.*',
+          publishedAt: '2024-01-15',
+          status: 'published' as const,
+          views: 1250,
+          author: 'Geoff Wiggs',
+          category: 'Bankruptcy',
+          createdAt: '2024-01-15T10:00:00Z',
+          updatedAt: '2024-01-15T10:00:00Z',
+          imageUrl: '/images/AdobeStock_251049533-2-scaled.webp',
+          imageAlt: 'Bankruptcy law consultation',
+          featuredImage: '/images/AdobeStock_251049533-2-scaled.webp',
+          publishDate: '2024-01-15'
+        },
+        {
+          id: '2',
+          title: 'Estate Planning: Protecting Your Family\'s Future',
+          slug: 'estate-planning-protecting-family-future',
+          excerpt: 'Essential steps to ensure your assets are protected and your wishes are carried out.',
+          content: '# Estate Planning: Protecting Your Family\'s Future\n\nEstate planning is one of the most important things you can do to protect your family and ensure your wishes are carried out after you\'re gone.\n\n## What is Estate Planning?\n\nEstate planning involves making decisions about how your assets will be managed and distributed after your death.\n\n*This article is for informational purposes only and does not constitute legal advice.*',
+          publishedAt: '2024-01-10',
+          status: 'published' as const,
+          views: 890,
+          author: 'Nadya Machrus',
+          category: 'Estate Planning',
+          createdAt: '2024-01-10T10:00:00Z',
+          updatedAt: '2024-01-10T10:00:00Z',
+          imageUrl: '/images/AdobeStock_303448308-scaled.webp',
+          imageAlt: 'Estate planning documents',
+          featuredImage: '/images/AdobeStock_303448308-scaled.webp',
+          publishDate: '2024-01-10'
+        }
+      ];
+      
+      // Save sample data to localStorage
+      blogService.savePosts(sampleData);
+      return sampleData;
+    } catch (error) {
+      console.error('Error in getAllPosts:', error);
+      // Return empty array as fallback
+      return [];
     }
-    
-    // If we reach here, either Firebase is disabled or failed, and localStorage is empty
-    // The blogService.getAllPosts() should have already initialized sample data
-    // But let's make sure by calling it again
-    const finalPosts = blogService.getAllPosts();
-    return finalPosts;
   },
 
   // Get a single post by ID
