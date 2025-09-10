@@ -157,7 +157,7 @@ export const firebaseBlogService = {
   // Delete a post
   async deletePost(id: string): Promise<boolean> {
     try {
-      await deleteDoc(doc(db, COLLECTION_NAME, id));
+      await deleteDoc(doc(db, 'posts', id));
       return true;
     } catch (error) {
       console.error('Error deleting post:', error);
