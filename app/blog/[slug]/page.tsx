@@ -378,11 +378,6 @@ export default function BlogPostPage() {
               {post.title}
             </h1>
 
-            {/* Post Excerpt */}
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              {post.excerpt}
-            </p>
-
             {/* Post Content */}
             <div 
               className="prose prose-lg max-w-none"
@@ -499,6 +494,7 @@ export default function BlogPostPage() {
           </div>
         </div>
       </footer>
+
       </main>
     </>
   );
