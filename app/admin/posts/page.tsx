@@ -61,11 +61,23 @@ function AdminPostsContent() {
 
   const handleDelete = async (postId: string) => {
     if (confirm('Are you sure you want to delete this post?')) {
-      const success = await hybridBlogService.deletePost(postId);
-      if (success) {
-        setPosts(posts.filter(post => post.id !== postId));
-      } else {
-        alert('Error deleting post. Please try again.');
+      try {
+        console.log('🗑️ Admin: Attempting to delete post:', postId);
+        const success = await hybridBlogService.deletePost(postId);
+        
+        if (success) {
+          console.log('✅ Admin: Post deleted successfully');
+          setPosts(posts.filter(post => post.id !== postId));
+          // Show success message
+          setShowSuccessMessage(true);
+          setTimeout(() => setShowSuccessMessage(false), 3000);
+        } else {
+          console.error('❌ Admin: Failed to delete post');
+          alert('Error deleting post. Please check the console for details and try again.');
+        }
+      } catch (error) {
+        console.error('❌ Admin: Delete error:', error);
+        alert(`Error deleting post: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
   };

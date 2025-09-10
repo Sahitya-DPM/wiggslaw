@@ -169,10 +169,25 @@ export const firebaseBlogService = {
   // Delete a post
   async deletePost(id: string): Promise<boolean> {
     try {
-      await deleteDoc(doc(db, 'posts', id));
+      console.log('🗑️ Attempting to delete post from Firestore:', id);
+      
+      if (!db) {
+        console.error('❌ Firebase database not initialized');
+        throw new Error('Firebase database not initialized');
+      }
+      
+      const docRef = doc(db, 'posts', id);
+      await deleteDoc(docRef);
+      
+      console.log('✅ Post successfully deleted from Firestore:', id);
       return true;
     } catch (error) {
-      console.error('Error deleting post:', error);
+      console.error('❌ Error deleting post from Firestore:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: (error as any)?.code,
+        id
+      });
       return false;
     }
   },

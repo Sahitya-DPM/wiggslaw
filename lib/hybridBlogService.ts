@@ -156,20 +156,30 @@ export const hybridBlogService = {
 
   // Delete a post
   async deletePost(id: string): Promise<boolean> {
+    console.log('🗑️ Deleting post:', id);
+    
     // Always delete from localStorage first for reliability
-    const deleted = blogService.deletePost(id);
+    const localDeleted = blogService.deletePost(id);
+    console.log('Local delete result:', localDeleted);
     
     // If Firebase is enabled, also try to delete there
     if (USE_FIREBASE) {
       try {
-        await firebaseBlogService.deletePost(id);
-        console.log('Post also deleted from Firebase');
+        const firebaseDeleted = await firebaseBlogService.deletePost(id);
+        console.log('Firebase delete result:', firebaseDeleted);
+        
+        if (firebaseDeleted) {
+          console.log('✅ Post deleted from both localStorage and Firebase');
+        } else {
+          console.warn('⚠️ Firebase delete failed, but post deleted from localStorage');
+        }
       } catch (error) {
-        console.warn('Firebase delete failed, but post deleted from localStorage:', error);
+        console.error('❌ Firebase delete error:', error);
+        console.warn('⚠️ Firebase delete failed, but post deleted from localStorage');
       }
     }
     
-    return deleted;
+    return localDeleted;
   },
 
   // Increment view count
