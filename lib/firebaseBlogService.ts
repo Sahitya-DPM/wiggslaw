@@ -145,23 +145,47 @@ export const firebaseBlogService = {
   // Update an existing post
   async updatePost(id: string, updates: Partial<Omit<BlogPost, 'id' | 'createdAt' | 'views'>>): Promise<BlogPost | null> {
     try {
+      console.log('🔥 Firebase: Updating post:', id);
+      console.log('📝 Firebase: Update data:', updates);
+      
+      if (!db) {
+        console.error('❌ Firebase database not initialized');
+        throw new Error('Firebase database not initialized');
+      }
+      
       const docRef = doc(db, 'posts', id);
       await updateDoc(docRef, {
         ...updates,
         updatedAt: serverTimestamp()
       });
       
+      console.log('✅ Firebase: Post updated successfully');
+      
       // Return updated post
       const updatedDoc = await getDoc(docRef);
       if (updatedDoc.exists()) {
-        return {
+        const updatedPost = {
           id: updatedDoc.id,
-          ...updatedDoc.data()
+          ...updatedDoc.data(),
+          // Ensure required fields are present
+          createdAt: updatedDoc.data().createdAt?.toDate?.()?.toISOString() || updatedDoc.data().createdAt || new Date().toISOString(),
+          updatedAt: updatedDoc.data().updatedAt?.toDate?.()?.toISOString() || updatedDoc.data().updatedAt || new Date().toISOString(),
+          publishedAt: updatedDoc.data().publishedAt || updatedDoc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
         } as BlogPost;
+        
+        console.log('📊 Firebase: Returning updated post:', updatedPost.title);
+        return updatedPost;
       }
+      
+      console.warn('⚠️ Firebase: Updated document not found after update');
       return null;
     } catch (error) {
-      console.error('Error updating post:', error);
+      console.error('❌ Firebase: Error updating post:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: (error as any)?.code,
+        id
+      });
       return null;
     }
   },

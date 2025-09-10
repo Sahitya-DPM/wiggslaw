@@ -138,19 +138,31 @@ export const hybridBlogService = {
 
   // Update an existing post
   async updatePost(id: string, updates: Partial<Omit<BlogPost, 'id' | 'createdAt' | 'views'>>): Promise<BlogPost | null> {
+    console.log('🔄 Hybrid: Updating post:', id);
+    console.log('📝 Hybrid: Update data:', updates);
+    
     // Always update localStorage first for reliability
     const updatedPost = blogService.updatePost(id, updates);
+    console.log('💾 Hybrid: Local update result:', updatedPost ? 'Success' : 'Failed');
     
     // If Firebase is enabled, also try to update there
     if (USE_FIREBASE) {
       try {
-        await firebaseBlogService.updatePost(id, updates);
-        console.log('Post also updated in Firebase');
+        const firebaseResult = await firebaseBlogService.updatePost(id, updates);
+        console.log('🔥 Hybrid: Firebase update result:', firebaseResult ? 'Success' : 'Failed');
+        
+        if (firebaseResult) {
+          console.log('✅ Post updated in both localStorage and Firebase');
+        } else {
+          console.warn('⚠️ Firebase update returned null, but localStorage was updated');
+        }
       } catch (error) {
-        console.warn('Firebase update failed, but post updated in localStorage:', error);
+        console.error('❌ Firebase update failed:', error);
+        console.warn('⚠️ Firebase update failed, but post updated in localStorage');
       }
     }
     
+    console.log('📊 Hybrid: Final update result:', updatedPost ? 'Success' : 'Failed');
     return updatedPost;
   },
 

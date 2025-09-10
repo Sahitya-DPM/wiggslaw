@@ -37,7 +37,9 @@ function AdminPostsContent() {
   // Check for success message parameter
   useEffect(() => {
     const published = searchParams.get('published');
-    if (published === 'true') {
+    const updated = searchParams.get('updated');
+    
+    if (published === 'true' || updated === 'true') {
       setShowSuccessMessage(true);
       // Auto-hide message after 5 seconds
       setTimeout(() => {
@@ -47,6 +49,7 @@ function AdminPostsContent() {
       // Remove the URL parameter after showing the message
       const url = new URL(window.location.href);
       url.searchParams.delete('published');
+      url.searchParams.delete('updated');
       window.history.replaceState({}, '', url.toString());
     }
   }, [searchParams]);

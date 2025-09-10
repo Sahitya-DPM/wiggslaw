@@ -147,6 +147,13 @@ export default function EditPost() {
     setIsSubmitting(true);
 
     try {
+      console.log('🔄 Starting post update for ID:', postId);
+      console.log('📝 Update data:', {
+        title: formData.title,
+        status: formData.status,
+        category: formData.category
+      });
+
       // Update the post using the hybrid blog service
       const updatedPost = await hybridBlogService.updatePost(postId, {
         title: formData.title,
@@ -165,16 +172,19 @@ export default function EditPost() {
         metaDescription: formData.metaDescription
       });
 
+      console.log('📊 Update result:', updatedPost);
+
       if (updatedPost) {
-        console.log('Post updated successfully:', updatedPost);
-        // Redirect to posts list
-        router.push('/admin/posts');
+        console.log('✅ Post updated successfully:', updatedPost);
+        // Redirect to posts list with success message
+        router.push('/admin/posts?updated=true');
       } else {
-        alert('Error updating post. Please try again.');
+        console.error('❌ Update returned null - post not found or update failed');
+        alert('Error: Post not found or update failed. Please try again.');
       }
     } catch (error) {
-      console.error('Error updating post:', error);
-      alert('Error updating post. Please try again.');
+      console.error('❌ Error updating post:', error);
+      alert(`Error updating post: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }
