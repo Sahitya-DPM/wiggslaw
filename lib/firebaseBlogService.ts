@@ -30,6 +30,10 @@ export const firebaseBlogService = {
   // Get all posts
   async getAllPosts(): Promise<BlogPost[]> {
     try {
+      if (!db) {
+        throw new Error('Firebase database not initialized');
+      }
+      
       const q = query(collection(db, COLLECTION_NAME), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
       
@@ -39,13 +43,17 @@ export const firebaseBlogService = {
       } as BlogPost));
     } catch (error) {
       console.error('Error getting posts:', error);
-      return [];
+      throw error; // Re-throw to trigger fallback
     }
   },
 
   // Get a single post by ID
   async getPostById(id: string): Promise<BlogPost | null> {
     try {
+      if (!db) {
+        throw new Error('Firebase database not initialized');
+      }
+      
       const docRef = doc(db, COLLECTION_NAME, id);
       const docSnap = await getDoc(docRef);
       
@@ -58,13 +66,17 @@ export const firebaseBlogService = {
       return null;
     } catch (error) {
       console.error('Error getting post:', error);
-      return null;
+      throw error; // Re-throw to trigger fallback
     }
   },
 
   // Get a single post by slug
   async getPostBySlug(slug: string): Promise<BlogPost | null> {
     try {
+      if (!db) {
+        throw new Error('Firebase database not initialized');
+      }
+      
       const q = query(collection(db, COLLECTION_NAME), where('slug', '==', slug));
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
@@ -74,7 +86,7 @@ export const firebaseBlogService = {
       return null;
     } catch (error) {
       console.error('Error getting post by slug:', error);
-      return null;
+      throw error; // Re-throw to trigger fallback
     }
   },
 
@@ -173,6 +185,10 @@ export const firebaseBlogService = {
   // Get posts by status
   async getPostsByStatus(status: 'published' | 'draft'): Promise<BlogPost[]> {
     try {
+      if (!db) {
+        throw new Error('Firebase database not initialized');
+      }
+      
       const q = query(
         collection(db, COLLECTION_NAME), 
         where('status', '==', status),
@@ -186,13 +202,17 @@ export const firebaseBlogService = {
       } as BlogPost));
     } catch (error) {
       console.error('Error getting posts by status:', error);
-      return [];
+      throw error; // Re-throw to trigger fallback
     }
   },
 
   // Search posts
   async searchPosts(queryText: string): Promise<BlogPost[]> {
     try {
+      if (!db) {
+        throw new Error('Firebase database not initialized');
+      }
+      
       // Note: Firestore doesn't support full-text search natively
       // This is a basic implementation - for production, consider using Algolia or similar
       const allPosts = await this.getAllPosts();
@@ -207,7 +227,7 @@ export const firebaseBlogService = {
       );
     } catch (error) {
       console.error('Error searching posts:', error);
-      return [];
+      throw error; // Re-throw to trigger fallback
     }
   },
 
