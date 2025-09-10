@@ -1,4 +1,4 @@
-import { blogService, BlogPost } from './blogService';
+import { blogService, BlogPost, initializeSampleData } from './blogService';
 import { firebaseBlogService } from './firebaseBlogService';
 
 // Configuration to switch between localStorage and Firebase
@@ -43,17 +43,31 @@ export const hybridBlogService = {
         
         // If no posts in Firestore, fall back to localStorage
         const localPosts = blogService.getAllPosts();
-        return localPosts;
+        if (localPosts.length > 0) {
+          return localPosts;
+        }
+        
+        // If no posts anywhere, ensure sample data is available
+        const sampleData = initializeSampleData();
+        return sampleData;
       } catch (error) {
         console.error('Error fetching posts from Firestore:', error);
         
         // Fall back to localStorage on Firestore error
         try {
           const localPosts = blogService.getAllPosts();
-          return localPosts;
+          if (localPosts.length > 0) {
+            return localPosts;
+          }
+          
+          // If no posts in localStorage either, ensure sample data is available
+          const sampleData = initializeSampleData();
+          return sampleData;
         } catch (localError) {
           console.error('Error fetching posts from localStorage:', localError);
-          return [];
+          // Last resort: return sample data
+          const sampleData = initializeSampleData();
+          return sampleData;
         }
       }
     } else {

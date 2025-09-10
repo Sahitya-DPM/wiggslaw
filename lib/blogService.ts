@@ -442,3 +442,5 @@ export const blogService = {
     );
   }
 };
+
+export { initializeSampleData };
