@@ -30,15 +30,20 @@ try {
   
   if (isUsingDemoConfig) {
     console.warn('⚠️ Using demo Firebase configuration. Data will be saved to localStorage only.');
-    console.warn('To enable real Firebase, create a .env.local file with your Firebase credentials.');
-    console.warn('See FIREBASE_SETUP.md for detailed instructions.');
+    console.warn('To enable real Firebase, run: node setup-firebase.js');
+    console.warn('Or create a .env.local file with your Firebase credentials.');
+    console.warn('See FIREBASE_SETUP_GUIDE.md for detailed instructions.');
   } else {
     console.log('✅ Firebase initialized successfully with real configuration');
+    console.log('📊 Project ID:', firebaseConfig.projectId);
+    console.log('🔗 Auth Domain:', firebaseConfig.authDomain);
   }
 } catch (error) {
   console.warn('❌ Firebase initialization failed:', error);
   if (isUsingDemoConfig) {
     console.warn('This is expected with demo configuration. Data will be saved to localStorage.');
+  } else {
+    console.warn('Please check your Firebase configuration in .env.local');
   }
   // Set to null so other services can handle gracefully
   app = null;
