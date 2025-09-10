@@ -28,22 +28,35 @@ const generateSlug = (title: string): string => {
 
 export const firebaseBlogService = {
   // Get all posts - Always fetch from Firestore "posts" collection, ordered by createdAt descending
+  // This method works without authentication - public read access
   async getAllPosts(): Promise<BlogPost[]> {
     try {
       if (!db) {
         throw new Error('Firebase database not initialized');
       }
       
+      console.log('🔍 Fetching blog posts from Firestore...');
+      
       // Query the "posts" collection, ordered by createdAt descending
       const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
       
-      return querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as BlogPost));
+      const posts = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          // Ensure required fields are present
+          createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt || new Date().toISOString(),
+          updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt || new Date().toISOString(),
+          publishedAt: data.publishedAt || data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        } as BlogPost;
+      });
+      
+      console.log(`✅ Successfully fetched ${posts.length} posts from Firestore`);
+      return posts;
     } catch (error) {
-      console.error('Error getting posts from Firestore:', error);
+      console.error('❌ Error getting posts from Firestore:', error);
       throw error; // Re-throw to trigger fallback
     }
   },
@@ -94,8 +107,7 @@ export const firebaseBlogService = {
   // Save a new post
   async savePost(post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt' | 'views' | 'slug'>): Promise<BlogPost> {
     try {
-      console.log('Firebase savePost called with:', post);
-      console.log('Database object:', db);
+      console.log('💾 Saving blog post to Firestore...', post);
       
       if (!db) {
         throw new Error('Firebase database not initialized');
@@ -106,7 +118,7 @@ export const firebaseBlogService = {
         slug: generateSlug(post.title)
       };
       
-      console.log('Post with slug:', postWithSlug);
+      console.log('📝 Post with generated slug:', postWithSlug);
       
       const docRef = await addDoc(collection(db, 'posts'), {
         ...postWithSlug,
@@ -115,7 +127,7 @@ export const firebaseBlogService = {
         views: 0
       });
       
-      console.log('Document created with ID:', docRef.id);
+      console.log('✅ Blog post saved to Firestore with ID:', docRef.id);
       
       return {
         id: docRef.id,
